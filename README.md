@@ -1,10 +1,16 @@
 # HTML Canvas Utilities
 
 [![Demo](https://github.com/rodydavis/html-canvas-utilities/actions/workflows/ci.yml/badge.svg)](https://github.com/rodydavis/html-canvas-utilities/actions/workflows/ci.yml)
+[![Published on npm](https://img.shields.io/npm/v/html-canvas-utilities.svg)](https://www.npmjs.com/package/html-canvas-utilities)
 
 Abstract canvas controller that can take a set of drawable children and render them to the canvas while hooking up events for pan, zoom, move and select.
 
 [Online Demo](https://rodydavis.github.io/html-canvas-utilities/)
+
+- ✅ No Dependencies
+- ✅ ES Modules
+- ✅ Full Browser Support
+- ✅ 100% Typescript
 
 https://user-images.githubusercontent.com/31253215/156279985-b89cc58c-6549-491c-b641-b67fb9a4eae5.mov
 

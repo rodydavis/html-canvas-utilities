@@ -1,0 +1,6 @@
+example
+src
+tsconfig.json
+tsconfig.node.json
+.github
+.vscode

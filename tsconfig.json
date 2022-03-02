@@ -12,7 +12,7 @@
       "dom",
       "dom.iterable"
     ],
-    "outDir": "build",
+    "outDir": "dist",
     "skipLibCheck": true
   },
   "include": [
