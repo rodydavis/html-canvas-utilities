@@ -1,3 +1,7 @@
+## 0.0.3
+
+- Fixing install
+
 ## 0.0.2
 
 - Ignoring files

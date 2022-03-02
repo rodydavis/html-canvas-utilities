@@ -1,6 +1,6 @@
 {
   "name": "html-canvas-utilities",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Canvas utilities for the browser (Pan, zoom, move, select).",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -37,8 +37,7 @@
   ],
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch",
-    "postinstall": "npm run build"
+    "dev": "tsc -p tsconfig.json --watch"
   },
   "dependencies": {
     "lit": "^2.0.2"
