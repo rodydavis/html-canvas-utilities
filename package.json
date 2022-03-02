@@ -2,8 +2,13 @@
   "name": "html-canvas-utilities",
   "private": true,
   "version": "0.0.0",
+  "main": "build/html-canvas-utilities.umd.js",
+  "module": "build/html-canvas-utilities.es.js",
+  "typings": "types/html-canvas-utilities.d.ts",
   "scripts": {
     "dev": "vite --host",
+    "module": "vite --config vite.config.module.ts build",
+    "postinstall": "npm run module",
     "build": "tsc && vite build"
   },
   "dependencies": {

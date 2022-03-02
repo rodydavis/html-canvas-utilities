@@ -3,13 +3,11 @@ import { resolve } from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/html-canvas-utilities/",
-
   build: {
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, "index.html"),
-      },
+    outDir: "build",
+    lib: {
+      entry: "src/controller/index.ts",
+      name: "html-canvas-utilities",
     },
   },
 });
