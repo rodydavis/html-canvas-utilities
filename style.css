@@ -1,9 +1,16 @@
+html,
+body {
+  -webkit-text-size-adjust: none;
+  user-select: none;
+  user-zoom: none;
+  overflow: auto;
+}
 body {
   margin: 0;
   padding: 0;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  min-height: -webkit-fill-available;
 }
 canvas-editor {
   position: fixed;

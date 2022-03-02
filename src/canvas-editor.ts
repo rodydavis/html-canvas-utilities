@@ -11,9 +11,14 @@ export class CanvasEditor extends LitElement {
       --canvas-controller-grid-color: #ccc;
       --canvas-controller-selected-color: #f00;
       --canvas-controller-hovered-color: #0f0;
-      width: 100%;
-      height: 100%;
       cursor: pointer;
+      user-select: none;
+      user-zoom: none;
+      /* min-height: 100vh; */
+      /* max-height: 100vh; */
+      /* min-width: 100vw; */
+      /* max-width: 100vw; */
+      /* min-height: -webkit-fill-available; */
     }
     @media (prefers-color-scheme: dark) {
       canvas {
@@ -28,7 +33,7 @@ export class CanvasEditor extends LitElement {
   @query("#canvas") canvas!: HTMLCanvasElement;
 
   render() {
-    return html` <canvas id="canvas" touch-action="none"></canvas> `;
+    return html` <canvas id="canvas"></canvas> `;
   }
 
   firstUpdated() {
