@@ -1,6 +1,10 @@
 # HTML Canvas Utilities
 
+[![Demo](https://github.com/rodydavis/html-canvas-utilities/actions/workflows/ci.yml/badge.svg)](https://github.com/rodydavis/html-canvas-utilities/actions/workflows/ci.yml)
+
 Abstract canvas controller that can take a set of drawable children and render them to the canvas while hooking up events for pan, zoom, move and select.
+
+![Demo](https://rodydavis.github.io/html-canvas-utilities/)
 
 ## Gestures
 
