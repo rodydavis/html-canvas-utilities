@@ -141,7 +141,7 @@ class CanvasTransformer extends Listenable {
     };
   }
   onWheelEvent(e) {
-    e.preventDefault();
+    this.preventDefault(e);
     if (this.gestureEvent)
       return;
     const origin = new DOMPoint(e.offsetX, e.offsetY);
@@ -169,37 +169,45 @@ class CanvasTransformer extends Listenable {
     this.mouseDown = false;
   }
   onTouchStart(e) {
-    e.preventDefault();
+    this.preventDefault(e);
     this.touches = e.touches;
     this.mouseDown = true;
     this.gestureEvent = this.touches.length > 1;
   }
   onTouchMove(e) {
-    e.preventDefault();
+    this.preventDefault(e);
     const prev = this.touches;
     this.touches = e.touches;
     if (this.gestureEvent) {
+      const oldPoint1 = new DOMPoint(prev[0].clientX, prev[0].clientY);
+      const oldPoint2 = new DOMPoint(prev[1].clientX, prev[1].clientY);
+      const newPoint1 = new DOMPoint(this.touches[0].clientX, this.touches[0].clientY);
+      const newPoint2 = new DOMPoint(this.touches[1].clientX, this.touches[1].clientY);
       if (this.touches.length === 2) {
-        const oldCenter = new DOMPoint((prev[0].clientX + prev[1].clientX) / 2, (prev[0].clientY + prev[1].clientY) / 2);
-        const newCenter = new DOMPoint((e.touches[0].clientX + e.touches[1].clientX) / 2, (e.touches[0].clientY + e.touches[1].clientY) / 2);
-        const oldDistance = prev[0].clientX - prev[1].clientX;
-        const newDistance = e.touches[0].clientX - e.touches[1].clientX;
+        const oldCenter = new DOMPoint((oldPoint1.x + oldPoint2.x) / 2, (oldPoint1.y + oldPoint2.y) / 2);
+        const newCenter = new DOMPoint((newPoint1.x + newPoint2.x) / 2, (newPoint1.y + newPoint2.y) / 2);
+        const oldDistance = oldPoint1.x - oldPoint2.x;
+        const newDistance = newPoint1.x - newPoint2.x;
         const scale = newDistance / oldDistance;
         this.scale(scale, newCenter);
         if (newCenter !== oldCenter) {
-          const delta = new DOMPoint(newCenter.x - oldCenter.x, newCenter.y - oldCenter.y);
+          const oldMin = new DOMPoint(Math.min(oldPoint1.x, oldPoint2.x), Math.min(oldPoint1.y, oldPoint2.y));
+          const newMin = new DOMPoint(Math.min(newPoint1.x, newPoint2.x), Math.min(newPoint1.y, newPoint2.y));
+          const delta = new DOMPoint(newMin.x - oldMin.x, newMin.y - oldMin.y);
           this.pan(delta);
         }
       } else if (this.touches.length === 3) {
-        const oldMin = new DOMPoint(Math.min(prev[0].clientX, prev[1].clientX, prev[2].clientX), Math.min(prev[0].clientY, prev[1].clientY, prev[2].clientY));
-        const newMin = new DOMPoint(Math.min(e.touches[0].clientX, e.touches[1].clientX, e.touches[2].clientX), Math.min(e.touches[0].clientY, e.touches[1].clientY, e.touches[2].clientY));
+        const oldPoint3 = new DOMPoint(prev[2].clientX, prev[2].clientY);
+        const newPoint3 = new DOMPoint(this.touches[2].clientX, this.touches[2].clientY);
+        const oldMin = new DOMPoint(Math.min(oldPoint1.x, oldPoint2.x, oldPoint3.x), Math.min(oldPoint1.y, oldPoint2.y, oldPoint3.y));
+        const newMin = new DOMPoint(Math.min(newPoint1.x, newPoint2.x, oldPoint3.x), Math.min(newPoint1.y, newPoint2.y, newPoint3.y));
         const delta = new DOMPoint(newMin.x - oldMin.x, newMin.y - oldMin.y);
         this.pan(delta);
       }
     }
   }
   onTouchEnd(e) {
-    e.preventDefault();
+    this.preventDefault(e);
     this.touches = e.touches;
     this.mouseDown = this.touches.length === 0;
     this.gestureEvent = this.touches.length > 1;
@@ -220,6 +228,9 @@ class CanvasTransformer extends Listenable {
     }
   }
   onKeyUpEvent(e) {
+  }
+  preventDefault(e) {
+    e.preventDefault();
   }
 }
 function decomposeMatrix(m) {

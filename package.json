@@ -7,8 +7,8 @@
   "typings": "types/html-canvas-utilities.d.ts",
   "scripts": {
     "dev": "vite --host",
-    "module": "vite --config vite.config.module.ts build",
-    "postinstall": "npm run module",
+    "package": "vite --config vite.config.module.ts build",
+    "postinstall": "npm run package",
     "build": "tsc && vite build"
   },
   "dependencies": {
