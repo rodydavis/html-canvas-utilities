@@ -195,32 +195,54 @@ export class CanvasTransformer<T> extends Listenable<T> {
     this.touches = e.touches;
 
     if (this.gestureEvent) {
-      // Get the center of the two touches
-      const oldCenter = new DOMPoint(
-        (prev[0].clientX + prev[1].clientX) / 2,
-        (prev[0].clientY + prev[1].clientY) / 2
-      );
-      const newCenter = new DOMPoint(
-        (e.touches[0].clientX + e.touches[1].clientX) / 2,
-        (e.touches[0].clientY + e.touches[1].clientY) / 2
-      );
-
-      // Get the distance between the two touches
-      const oldDistance = prev[0].clientX - prev[1].clientX;
-      const newDistance = e.touches[0].clientX - e.touches[1].clientX;
-
-      // Get the scale factor
-      const scale = newDistance / oldDistance;
-
-      // Scale at the center of the two touches
-      this.scale(scale, newCenter);
-
-      // Pan the difference between the two touches
-      if (newCenter !== oldCenter) {
-        const delta = new DOMPoint(
-          newCenter.x - oldCenter.x,
-          newCenter.y - oldCenter.y
+      if (this.touches.length === 2) {
+        // Get the center of the two touches
+        const oldCenter = new DOMPoint(
+          (prev[0].clientX + prev[1].clientX) / 2,
+          (prev[0].clientY + prev[1].clientY) / 2
         );
+        const newCenter = new DOMPoint(
+          (e.touches[0].clientX + e.touches[1].clientX) / 2,
+          (e.touches[0].clientY + e.touches[1].clientY) / 2
+        );
+
+        // Get the distance between the two touches
+        const oldDistance = prev[0].clientX - prev[1].clientX;
+        const newDistance = e.touches[0].clientX - e.touches[1].clientX;
+
+        // Get the scale factor
+        const scale = newDistance / oldDistance;
+
+        // Scale at the center of the two touches
+        this.scale(scale, newCenter);
+
+        // Pan the difference between the two touches
+        if (newCenter !== oldCenter) {
+          const delta = new DOMPoint(
+            newCenter.x - oldCenter.x,
+            newCenter.y - oldCenter.y
+          );
+          this.pan(delta);
+        }
+      } else if (this.touches.length === 3) {
+        // Pan the canvas
+        const oldMin = new DOMPoint(
+          Math.min(prev[0].clientX, prev[1].clientX, prev[2].clientX),
+          Math.min(prev[0].clientY, prev[1].clientY, prev[2].clientY)
+        );
+        const newMin = new DOMPoint(
+          Math.min(
+            e.touches[0].clientX,
+            e.touches[1].clientX,
+            e.touches[2].clientX
+          ),
+          Math.min(
+            e.touches[0].clientY,
+            e.touches[1].clientY,
+            e.touches[2].clientY
+          )
+        );
+        const delta = new DOMPoint(newMin.x - oldMin.x, newMin.y - oldMin.y);
         this.pan(delta);
       }
     }
