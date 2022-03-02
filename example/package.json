@@ -2,17 +2,8 @@
   "name": "example",
   "private": true,
   "version": "0.0.0",
-  "main": "dist/my-element.es.js",
-  "exports": {
-    ".": "./dist/my-element.es.js"
-  },
-  "types": "types/my-element.d.ts",
-  "files": [
-    "dist",
-    "types"
-  ],
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build"
   },
   "dependencies": {

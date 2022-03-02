@@ -22,8 +22,6 @@ export class CanvasController<
   canSelect = true;
   canMove = true;
   canDelete = true;
-  spacePressed = false;
-  middleClick = false;
 
   drawBackground() {
     const { offset, scale } = this.info;
@@ -193,13 +191,11 @@ export class CanvasController<
     if (e.key === "Backspace") {
       this.removeSelection();
     }
-    this.spacePressed = e.key === " ";
     this.updateCursor();
   }
 
   override onKeyUpEvent(e: KeyboardEvent): void {
     super.onKeyUpEvent(e);
-    this.spacePressed = false;
     this.updateCursor();
   }
 

@@ -62,6 +62,10 @@ export class CanvasTransformer<T> extends Listenable<T> {
   touches?: TouchList;
   mouse = new DOMPoint(0, 0);
   mouseDown = false;
+  spacePressed = false;
+  controlPressed = false;
+  middleClick = false;
+
   private transform: DOMMatrix;
   get matrix() {
     return this.transform;
@@ -160,7 +164,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
     this.preventDefault(e);
     if (this.gestureEvent) return;
     const origin = new DOMPoint(e.offsetX, e.offsetY);
-    if (e.ctrlKey) {
+    if (this.controlPressed) {
       let scale = 1;
       if (e.deltaY < 0) {
         scale = Math.min(this.maxScale, scale * 1.1);
@@ -278,6 +282,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
   }
 
   onKeyDownEvent(e: KeyboardEvent) {
+    this.preventDefault(e);
     if (e.key === "ArrowLeft") {
       this.pan(new DOMPoint(-10, 0));
     } else if (e.key === "ArrowRight") {
@@ -291,9 +296,15 @@ export class CanvasTransformer<T> extends Listenable<T> {
     } else if (e.key === "-") {
       this.scale(1 / 1.1, this.mouse);
     }
+    this.controlPressed = e.ctrlKey;
+    this.spacePressed = e.key === " ";
   }
 
-  onKeyUpEvent(e: KeyboardEvent) {}
+  onKeyUpEvent(e: KeyboardEvent) {
+    this.preventDefault(e);
+    this.controlPressed = false;
+    this.spacePressed = false;
+  }
 
   preventDefault(e: Event) {
     e.preventDefault();
