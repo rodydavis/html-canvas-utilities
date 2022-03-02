@@ -6,6 +6,8 @@ Abstract canvas controller that can take a set of drawable children and render t
 
 ![Demo](https://rodydavis.github.io/html-canvas-utilities/)
 
+https://user-images.githubusercontent.com/31253215/156279985-b89cc58c-6549-491c-b641-b67fb9a4eae5.mov
+
 ## Gestures
 
 - Mouse wheel events
