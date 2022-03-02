@@ -13,9 +13,7 @@ export class CanvasEditor extends LitElement {
       --canvas-controller-hovered-color: #0f0;
       width: 100%;
       height: 100%;
-      /* user-zoom: none;
-      user-select: none;
-      touch-action: none; */
+      cursor: pointer;
     }
     @media (prefers-color-scheme: dark) {
       canvas {
@@ -30,7 +28,7 @@ export class CanvasEditor extends LitElement {
   @query("#canvas") canvas!: HTMLCanvasElement;
 
   render() {
-    return html` <canvas id="canvas"></canvas> `;
+    return html` <canvas id="canvas" touch-action="none"></canvas> `;
   }
 
   firstUpdated() {

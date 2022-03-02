@@ -45,6 +45,12 @@ export class CanvasTransformer<T> extends Listenable<T> {
     this.onTouchEnd = this.onTouchEnd.bind(this);
     canvas.addEventListener("touchend", this.onTouchEnd, false);
 
+    // TODO: Prevent Safari iPadOS pinch / zoom
+    // canvas.addEventListener("gesturestart", this.preventDefault, false);
+    // canvas.addEventListener("gesturechange", this.preventDefault, false);
+    // canvas.addEventListener("gestureend", this.preventDefault, false);
+    // window.addEventListener("scroll", this.preventDefault, { passive: false });
+
     // Keyboard Events
     this.onKeyDownEvent = this.onKeyDownEvent.bind(this);
     this.onKeyUpEvent = this.onKeyUpEvent.bind(this);
@@ -183,14 +189,16 @@ export class CanvasTransformer<T> extends Listenable<T> {
   }
 
   onTouchStart(e: TouchEvent) {
-    e.preventDefault();
+    this.preventDefault(e);
+
     this.touches = e.touches;
     this.mouseDown = true;
     this.gestureEvent = this.touches.length > 1;
   }
 
   onTouchMove(e: TouchEvent) {
-    e.preventDefault();
+    this.preventDefault(e);
+
     const prev = this.touches!;
     this.touches = e.touches;
 
@@ -249,7 +257,8 @@ export class CanvasTransformer<T> extends Listenable<T> {
   }
 
   onTouchEnd(e: TouchEvent) {
-    e.preventDefault();
+    this.preventDefault(e);
+
     this.touches = e.touches;
     this.mouseDown = this.touches.length === 0;
     this.gestureEvent = this.touches.length > 1;
@@ -272,6 +281,8 @@ export class CanvasTransformer<T> extends Listenable<T> {
   }
 
   onKeyUpEvent(e: KeyboardEvent) {}
+
+  preventDefault(e: Event) {}
 }
 
 // https://gist.github.com/fwextensions/2052247
