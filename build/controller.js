@@ -1,4 +1,3 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -14,15 +13,13 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CanvasController = void 0;
-var infinite_grid_1 = require("./infinite-grid");
-var transformer_1 = require("./transformer");
-var utils_1 = require("./utils");
+import { drawInfiniteGrid } from "./infinite-grid";
+import { CanvasTransformer, defaultOptions, } from "./transformer";
+import { color } from "./utils";
 var CanvasController = /** @class */ (function (_super) {
     __extends(CanvasController, _super);
     function CanvasController(canvas, options) {
-        if (options === void 0) { options = transformer_1.defaultOptions; }
+        if (options === void 0) { options = defaultOptions; }
         var _this = _super.call(this, canvas, options) || this;
         _this.canvas = canvas;
         _this.options = options;
@@ -39,9 +36,9 @@ var CanvasController = /** @class */ (function (_super) {
     CanvasController.prototype.drawBackground = function () {
         var _a = this.info, offset = _a.offset, scale = _a.scale;
         var _b = this, ctx = _b.ctx, canvas = _b.canvas;
-        ctx.fillStyle = (0, utils_1.color)(canvas, "--canvas-controller-background-color");
+        ctx.fillStyle = color(canvas, "--canvas-controller-background-color");
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        (0, infinite_grid_1.drawInfiniteGrid)(canvas, ctx, {
+        drawInfiniteGrid(canvas, ctx, {
             offset: offset,
             scale: scale,
             backgroundColor: "--canvas-controller-background-color",
@@ -87,7 +84,7 @@ var CanvasController = /** @class */ (function (_super) {
     CanvasController.prototype.drawOutline = function (ctx, rect, strokeColor) {
         var canvas = this.canvas;
         ctx.save();
-        ctx.strokeStyle = (0, utils_1.color)(canvas, strokeColor);
+        ctx.strokeStyle = color(canvas, strokeColor);
         ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
         ctx.restore();
     };
@@ -212,6 +209,6 @@ var CanvasController = /** @class */ (function (_super) {
         this.updateSelection([widget]);
     };
     return CanvasController;
-}(transformer_1.CanvasTransformer));
-exports.CanvasController = CanvasController;
+}(CanvasTransformer));
+export { CanvasController };
 //# sourceMappingURL=controller.js.map

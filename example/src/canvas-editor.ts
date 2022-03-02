@@ -1,6 +1,6 @@
 import { html, css, LitElement } from "lit";
 import { customElement, query } from "lit/decorators.js";
-import { CanvasController } from "./controller";
+import { CanvasController } from "html-canvas-utilities";
 import { addRandomShapes } from "./shapes";
 
 @customElement("canvas-editor")

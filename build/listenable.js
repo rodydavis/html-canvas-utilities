@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Listenable = void 0;
 var Listenable = /** @class */ (function () {
     function Listenable() {
         this.listeners = [];
@@ -19,5 +16,5 @@ var Listenable = /** @class */ (function () {
     };
     return Listenable;
 }());
-exports.Listenable = Listenable;
+export { Listenable };
 //# sourceMappingURL=listenable.js.map

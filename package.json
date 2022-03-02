@@ -1,15 +1,44 @@
 {
   "name": "html-canvas-utilities",
-  "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "Canvas utilities for the browser (Pan, zoom, move, select).",
   "main": "build/index.js",
   "module": "build/index.js",
   "typings": "build/index.d.ts",
+  "keywords": [
+    "canvas",
+    "context-2d",
+    "html",
+    "typescript",
+    "browser",
+    "editor",
+    "pan",
+    "zoom",
+    "zoom-at-cursor"
+  ],
+  "author": {
+    "name": "Rody Davis",
+    "email": "rody.davis.jr@gmail.com"
+  },
+  "homepage": "https://rodydavis.github.io/html-canvas-utilities/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rodydavis/html-canvas-utilities"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "browserslist": [
+    "chrome >= 50",
+    "firefox >= 52",
+    "safari >= 10",
+    "ie >= 11"
+  ],
   "scripts": {
-    "dev": "vite --host",
-    "package": "rm -rf build && tsc -p tsconfig.module.json",
-    "postinstall": "npm run package",
-    "build": "tsc && vite build"
+    "build": "rm -rf build && tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "lit": "^2.0.2"

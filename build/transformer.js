@@ -1,4 +1,3 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -14,17 +13,15 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CanvasTransformer = exports.defaultOptions = void 0;
-var listenable_1 = require("./listenable");
-exports.defaultOptions = {
+import { Listenable } from "./listenable";
+export var defaultOptions = {
     scale: 1,
     offset: new DOMPoint(0, 0),
 };
 var CanvasTransformer = /** @class */ (function (_super) {
     __extends(CanvasTransformer, _super);
     function CanvasTransformer(canvas, options) {
-        if (options === void 0) { options = exports.defaultOptions; }
+        if (options === void 0) { options = defaultOptions; }
         var _this = _super.call(this) || this;
         _this.canvas = canvas;
         _this.options = options;
@@ -263,8 +260,8 @@ var CanvasTransformer = /** @class */ (function (_super) {
         e.preventDefault();
     };
     return CanvasTransformer;
-}(listenable_1.Listenable));
-exports.CanvasTransformer = CanvasTransformer;
+}(Listenable));
+export { CanvasTransformer };
 // https://gist.github.com/fwextensions/2052247
 function decomposeMatrix(m) {
     var E = (m.a + m.d) / 2;

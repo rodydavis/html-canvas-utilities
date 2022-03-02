@@ -1,4 +1,4 @@
-import { CanvasController } from "./controller";
+import { CanvasController } from "html-canvas-utilities";
 
 export function addRandomShapes(controller: CanvasController) {
   // Add some shapes
