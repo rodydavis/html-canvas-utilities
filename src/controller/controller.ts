@@ -22,6 +22,8 @@ export class CanvasController<
   canSelect = true;
   canMove = true;
   canDelete = true;
+  spacePressed = false;
+  middleClick = false;
 
   drawBackground() {
     const { offset, scale } = this.info;
@@ -118,6 +120,7 @@ export class CanvasController<
     if (this.canSelect) {
       this.updateSelection(this.select(this.mouse));
     }
+    this.middleClick = e.button === 1;
     this.updateCursor();
   }
 
@@ -126,6 +129,7 @@ export class CanvasController<
     if (this.canSelect) {
       this.updateSelection(this.select(this.mouse));
     }
+    this.middleClick = false;
     this.updateCursor();
   }
 
@@ -170,7 +174,7 @@ export class CanvasController<
   }
 
   move(delta: DOMPoint) {
-    if (this.spacePressed) {
+    if (this.spacePressed || this.middleClick) {
       this.pan(new DOMPoint(delta.x, delta.y));
     } else if (this.canMove && this.selection.length > 0) {
       const scale = this.info.scale;
@@ -183,8 +187,6 @@ export class CanvasController<
       }
     }
   }
-
-  spacePressed = false;
 
   override onKeyDownEvent(e: KeyboardEvent) {
     super.onKeyDownEvent(e);
@@ -206,7 +208,7 @@ export class CanvasController<
     const sameSelection =
       selection.length > 0 &&
       selection.every((widget) => hovered.includes(widget));
-    if (spacePressed) {
+    if (spacePressed || this.middleClick) {
       this.canvas.style.cursor = "grab";
     } else if (selection.length > 0 && sameSelection && canMove) {
       this.canvas.style.cursor = "move";
