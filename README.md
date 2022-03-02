@@ -115,12 +115,12 @@ export class CanvasEditor extends LitElement {
       const { offset, scale } = controller.info;
       console.debug(`offset: ${offset.x}, ${offset.y}; scale: ${scale}`);
     });
-    window.addEventListener("resize", () => {
+    const resize = () => {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight;
-    });
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+    };
+    window.addEventListener("resize", () => resize());
+    resize();
     
     controller.addChild({
         rect: new DOMRect(0, 0, 100, 100),
