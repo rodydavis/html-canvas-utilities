@@ -174,7 +174,6 @@ export class CanvasTransformer<T> extends Listenable<T> {
     } else {
       this.pan(new DOMPoint(-e.deltaX, -e.deltaY));
     }
-    // return false;
   }
 
   onMouseDown(e: MouseEvent) {
