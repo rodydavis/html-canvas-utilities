@@ -64,6 +64,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
   mouseDown = false;
   spacePressed = false;
   controlPressed = false;
+  shiftPressed = false;
   middleClick = false;
 
   private transform: DOMMatrix;
@@ -116,7 +117,6 @@ export class CanvasTransformer<T> extends Listenable<T> {
    */
   scale(scale: number, origin: DOMPoint = new DOMPoint(0, 0)) {
     if (Number.isNaN(scale)) return;
-    console.debug("scale", scale, origin);
     const amount = scale * this.info.scale;
     this.options.scale = amount;
     // Make sure the scale is within bounds
@@ -136,7 +136,6 @@ export class CanvasTransformer<T> extends Listenable<T> {
   pan(delta: DOMPoint) {
     if (Number.isNaN(delta)) return;
     const { scale } = this.info;
-    console.debug("pan", delta);
     this.options.offset.x += delta.x / scale;
     this.options.offset.y += delta.y / scale;
     this.matrix = this.matrix.translate(
@@ -164,7 +163,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
     this.preventDefault(e);
     if (this.gestureEvent) return;
     const origin = new DOMPoint(e.offsetX, e.offsetY);
-    if (this.controlPressed) {
+    if (e.ctrlKey || this.controlPressed) {
       let scale = 1;
       if (e.deltaY < 0) {
         scale = Math.min(this.maxScale, scale * 1.1);
@@ -297,6 +296,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
       this.scale(1 / 1.1, this.mouse);
     }
     this.controlPressed = e.ctrlKey;
+    this.shiftPressed = e.shiftKey;
     this.spacePressed = e.key === " ";
   }
 
@@ -304,6 +304,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
     this.preventDefault(e);
     this.controlPressed = false;
     this.spacePressed = false;
+    this.shiftPressed = false;
   }
 
   preventDefault(e: Event) {

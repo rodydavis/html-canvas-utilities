@@ -6,12 +6,25 @@ import {
 } from "./transformer";
 import { color } from "./utils";
 
+export interface CanvasControllerOptions extends CanvasTransformerOptions {
+  drawBackground?: (
+    ctx: CanvasRenderingContext2D,
+    offset: Offset,
+    scale: number
+  ) => void;
+  drawOutline?: (
+    ctx: CanvasRenderingContext2D,
+    rect: DOMRect,
+    strokeColor: string
+  ) => void;
+}
+
 export class CanvasController<
   T extends CanvasWidget = CanvasWidget
 > extends CanvasTransformer<T> {
   constructor(
     readonly canvas: HTMLCanvasElement,
-    readonly options: CanvasTransformerOptions = defaultOptions
+    readonly options: CanvasControllerOptions = defaultOptions
   ) {
     super(canvas, options);
   }
@@ -27,6 +40,13 @@ export class CanvasController<
     const { offset, scale } = this.info;
     const { ctx, canvas } = this;
 
+    if (this.options.drawBackground !== undefined) {
+      ctx.save();
+      this.options.drawBackground(ctx, offset, scale);
+      ctx.restore();
+      return;
+    }
+    ctx.save();
     ctx.fillStyle = color(canvas, "--canvas-controller-background-color");
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -36,6 +56,7 @@ export class CanvasController<
       backgroundColor: "--canvas-controller-background-color",
       gridColor: "--canvas-controller-grid-color",
     });
+    ctx.restore();
   }
 
   resize() {
@@ -69,7 +90,10 @@ export class CanvasController<
     for (const child of this.children) {
       ctx.save();
       ctx.translate(child.rect.x, child.rect.y);
-      child.draw(this.ctx);
+      child.draw(this.ctx, {
+        width: child.rect.width,
+        height: child.rect.height,
+      });
       ctx.restore();
 
       if (this.selection.includes(child)) {
@@ -86,6 +110,12 @@ export class CanvasController<
     strokeColor: string
   ) {
     const { canvas } = this;
+    if (this.options.drawOutline !== undefined) {
+      ctx.save();
+      this.options.drawOutline(ctx, rect, strokeColor);
+      ctx.restore();
+      return;
+    }
     ctx.save();
     ctx.strokeStyle = color(canvas, strokeColor);
     ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
@@ -234,7 +264,17 @@ export class CanvasController<
   }
 }
 
+export interface Offset {
+  x: number;
+  y: number;
+}
+
+export interface Size {
+  width: number;
+  height: number;
+}
+
 export interface CanvasWidget {
   rect: DOMRect;
-  draw(ctx: CanvasRenderingContext2D): void;
+  draw(ctx: CanvasRenderingContext2D, size: Size): void;
 }

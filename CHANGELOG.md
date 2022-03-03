@@ -1,3 +1,10 @@
+## 0.0.5
+
+- Adding override for drawBackground
+- Adding override for drawOutline
+- Adding control key for mobile
+- Removing log statements
+
 ## 0.0.4
 
 - Fixing control key event
