@@ -1,3 +1,11 @@
+## 0.0.6
+
+- Fixed mobile touch scale gesture
+- Adding children with relative rect
+- Adding double click to click inner child
+- Adding create canvas if not defined
+- Outer rect outline
+
 ## 0.0.5
 
 - Adding override for drawBackground

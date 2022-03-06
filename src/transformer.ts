@@ -12,7 +12,7 @@ export const defaultOptions: CanvasTransformerOptions = {
 
 export class CanvasTransformer<T> extends Listenable<T> {
   constructor(
-    readonly canvas: HTMLCanvasElement,
+    readonly canvas: HTMLCanvasElement = document.createElement("canvas"),
     readonly options: CanvasTransformerOptions = defaultOptions
   ) {
     super();
@@ -44,6 +44,12 @@ export class CanvasTransformer<T> extends Listenable<T> {
     canvas.addEventListener("touchmove", this.onTouchMove, false);
     this.onTouchEnd = this.onTouchEnd.bind(this);
     canvas.addEventListener("touchend", this.onTouchEnd, false);
+
+    // Double click and Click
+    this.onDoubleClick = this.onDoubleClick.bind(this);
+    canvas.addEventListener("dblclick", this.onDoubleClick, false);
+    this.onClick = this.onClick.bind(this);
+    canvas.addEventListener("click", this.onClick, false);
 
     // TODO: Prevent Safari iPadOS pinch / zoom
     // canvas.addEventListener("gesturestart", this.preventDefault, false);
@@ -227,8 +233,8 @@ export class CanvasTransformer<T> extends Listenable<T> {
         );
 
         // Get the distance between the two touches
-        const oldDistance = oldPoint1.x - oldPoint2.x;
-        const newDistance = newPoint1.x - newPoint2.x;
+        const oldDistance = distance(oldPoint1, oldPoint2);
+        const newDistance = distance(newPoint1, newPoint2);
 
         // Get the scale factor
         const scale = newDistance / oldDistance;
@@ -306,6 +312,14 @@ export class CanvasTransformer<T> extends Listenable<T> {
     this.shiftPressed = false;
   }
 
+  onDoubleClick(e: MouseEvent) {
+    this.preventDefault(e);
+  }
+
+  onClick(e: MouseEvent) {
+    this.preventDefault(e);
+  }
+
   preventDefault(e: Event) {
     e.preventDefault();
   }
@@ -333,4 +347,8 @@ function decomposeMatrix(m: DOMMatrix) {
     scaleY: Q - R,
     skew: (-theta * 180) / Math.PI,
   };
+}
+
+function distance(a: DOMPoint, b: DOMPoint): number {
+  return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 }

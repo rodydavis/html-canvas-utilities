@@ -23,7 +23,7 @@ export class CanvasController<
   T extends CanvasWidget = CanvasWidget
 > extends CanvasTransformer<T> {
   constructor(
-    readonly canvas: HTMLCanvasElement,
+    readonly canvas: HTMLCanvasElement = document.createElement("canvas"),
     readonly options: CanvasControllerOptions = defaultOptions
   ) {
     super(canvas, options);
@@ -35,6 +35,10 @@ export class CanvasController<
   canSelect = true;
   canMove = true;
   canDelete = true;
+  drawGrid = true;
+  selectIndex = 0;
+  isMoving = false;
+  dblClickTimeout?: number;
 
   drawBackground() {
     const { offset, scale } = this.info;
@@ -50,12 +54,14 @@ export class CanvasController<
     ctx.fillStyle = color(canvas, "--canvas-controller-background-color");
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    drawInfiniteGrid(canvas, ctx, {
-      offset,
-      scale,
-      backgroundColor: "--canvas-controller-background-color",
-      gridColor: "--canvas-controller-grid-color",
-    });
+    if (this.drawGrid) {
+      drawInfiniteGrid(canvas, ctx, {
+        offset,
+        scale,
+        backgroundColor: "--canvas-controller-background-color",
+        gridColor: "--canvas-controller-grid-color",
+      });
+    }
     ctx.restore();
   }
 
@@ -88,20 +94,40 @@ export class CanvasController<
 
   drawContent(ctx: CanvasRenderingContext2D) {
     for (const child of this.children) {
-      ctx.save();
-      ctx.translate(child.rect.x, child.rect.y);
-      child.draw(this.ctx, {
-        width: child.rect.width,
-        height: child.rect.height,
-      });
-      ctx.restore();
-
-      if (this.selection.includes(child)) {
-        this.drawOutline(ctx, child.rect, "--canvas-controller-selected-color");
-      } else if (this.hovered.includes(child)) {
-        this.drawOutline(ctx, child.rect, "--canvas-controller-hovered-color");
-      }
+      this.drawChild(ctx, child);
     }
+  }
+
+  drawChild(ctx: CanvasRenderingContext2D, child: T, parent?: DOMRect) {
+    ctx.save();
+    const rect = child.rect;
+    ctx.translate(rect.x, rect.y);
+    child.draw(this.ctx, {
+      width: rect.width,
+      height: rect.height,
+    });
+    ctx.restore();
+
+    if (child.children) {
+      ctx.save();
+      ctx.translate(rect.x, rect.y);
+      const children = child.children as T[];
+      for (const item of children) {
+        const rect = childRect(item.rect, parent);
+        this.drawChild(ctx, item, rect);
+      }
+      ctx.restore();
+    }
+
+    const outer = outerRect(getRects(child));
+    if (this.selection.includes(child)) {
+      this.drawOutline(ctx, outer, "--canvas-controller-selected-color");
+    } else if (this.hovered.includes(child)) {
+      this.drawOutline(ctx, outer, "--canvas-controller-hovered-color");
+    }
+
+    // // Outer Rect
+    // this.drawOutline(ctx, outer, "yellow");
   }
 
   drawOutline(
@@ -122,31 +148,62 @@ export class CanvasController<
     ctx.restore();
   }
 
-  select(point: DOMPoint, max: number = 1) {
+  getSelectionAt(
+    point: DOMPoint,
+    options: {
+      max: number;
+      level: number;
+    }
+  ) {
     const localPoint = this.localPoint(point);
     const selection: T[] = [];
 
-    const children = Array.from(this.children).reverse();
-    for (const child of children) {
-      const rect = child.rect;
-      if (
-        localPoint.x >= rect.x &&
-        localPoint.x <= rect.x + rect.width &&
-        localPoint.y >= rect.y &&
-        localPoint.y <= rect.y + rect.height
-      ) {
-        selection.push(child);
-        continue;
+    const searchChildren = (items: T[], level = 0, parent?: DOMRect) => {
+      const children = Array.from(items).reverse();
+      for (const child of children) {
+        const rect = childRect(child.rect, parent);
+        const mainRect = outerRect(getRects(child));
+        if (
+          localPoint.x >= mainRect.x &&
+          localPoint.x <= mainRect.x + mainRect.width &&
+          localPoint.y >= mainRect.y &&
+          localPoint.y <= mainRect.y + mainRect.height
+        ) {
+          if (level === options.level) {
+            selection.push(child);
+            continue;
+          }
+        } else if (
+          localPoint.x >= rect.x &&
+          localPoint.x <= rect.x + rect.width &&
+          localPoint.y >= rect.y &&
+          localPoint.y <= rect.y + rect.height
+        ) {
+          if (level === options.level) {
+            selection.push(child);
+            continue;
+          }
+        }
+        if (child.children) {
+          const subItems = child.children as T[];
+          searchChildren(subItems, level + 1, rect);
+        }
       }
-    }
-    return selection.slice(0, max);
+    };
+    searchChildren(this.children);
+    return selection.slice(0, options.max);
   }
 
   override onMouseDown(e: MouseEvent): void {
     super.onMouseDown(e);
 
     if (this.canSelect) {
-      this.updateSelection(this.select(this.mouse));
+      this.updateSelection(
+        this.getSelectionAt(this.mouse, {
+          max: 1,
+          level: this.selectIndex,
+        })
+      );
     }
     this.middleClick = e.button === 1;
     this.updateCursor();
@@ -154,9 +211,28 @@ export class CanvasController<
 
   override onMouseUp(e: MouseEvent): void {
     super.onMouseUp(e);
-    if (this.canSelect) {
-      this.updateSelection(this.select(this.mouse));
+    if (this.canSelect && !this.isMoving) {
+      // Check for dbclick delay
+      if (this.dblClickTimeout !== undefined) {
+        clearTimeout(this.dblClickTimeout);
+        this.dblClickTimeout = undefined;
+        // Double click
+        this.selectIndex += 1;
+        const point = new DOMPoint(e.clientX, e.clientY);
+        this.mouse = point;
+        this.selectAt(point);
+      } else {
+        this.dblClickTimeout = window.setTimeout(() => {
+          this.dblClickTimeout = undefined;
+          // Single click
+          this.selectIndex = 0;
+          const point = new DOMPoint(e.clientX, e.clientY);
+          this.mouse = point;
+          this.selectAt(point);
+        }, 300);
+      }
     }
+    this.isMoving = false;
     this.middleClick = false;
     this.updateCursor();
   }
@@ -164,8 +240,12 @@ export class CanvasController<
   override onMouseMove(e: MouseEvent): void {
     const currentMouse = this.mouse;
     super.onMouseMove(e);
-    this.hovered = this.select(this.mouse);
+    this.hovered = this.getSelectionAt(this.mouse, {
+      max: 1,
+      level: 0,
+    });
     if (this.mouseDown) {
+      this.isMoving = true;
       this.move(
         new DOMPoint(
           this.mouse.x - currentMouse.x,
@@ -182,7 +262,8 @@ export class CanvasController<
     if (!this.gestureEvent && this.canSelect) {
       const touch = e.touches[0];
       const point = new DOMPoint(touch.clientX, touch.clientY);
-      this.updateSelection(this.select(point));
+      this.selectIndex = 0;
+      this.selectAt(point);
     }
   }
 
@@ -243,6 +324,14 @@ export class CanvasController<
     }
   }
 
+  selectAt(point: DOMPoint) {
+    const selection = this.getSelectionAt(point, {
+      max: 1,
+      level: this.selectIndex,
+    });
+    this.updateSelection(selection);
+  }
+
   updateSelection(selection: T[]) {
     this.selection = selection;
     this.notify();
@@ -264,6 +353,58 @@ export class CanvasController<
   }
 }
 
+function childRect(main: DOMRect, parent?: DOMRect) {
+  if (!parent) return main;
+  return new DOMRect(
+    parent.x + main.x,
+    parent.y + main.y,
+    main.width,
+    main.height
+  );
+}
+
+function getRects(child: CanvasWidget, parent?: DOMRect) {
+  const rects: DOMRect[] = [];
+  const rect = childRect(child.rect, parent);
+  rects.push(rect);
+  if (child.children) {
+    const children = child.children as CanvasWidget[];
+    for (const item of children) {
+      rects.push(...getRects(item, rect));
+    }
+  }
+  return rects;
+}
+
+function outerRect(rects: DOMRect[]) {
+  if (rects.length === 0) {
+    return new DOMRect(0, 0, 0, 0);
+  }
+  const rect = new DOMRect(
+    rects[0].x,
+    rects[0].y,
+    rects[0].width,
+    rects[0].height
+  );
+  return rects.reduce((acc, cur) => {
+    if (cur.x < acc.x) {
+      acc.width += acc.x - cur.x;
+      acc.x = cur.x;
+    }
+    if (cur.y < acc.y) {
+      acc.height += acc.y - cur.y;
+      acc.y = cur.y;
+    }
+    if (cur.x + cur.width > acc.x + acc.width) {
+      acc.width = cur.x + cur.width - acc.x;
+    }
+    if (cur.y + cur.height > acc.y + acc.height) {
+      acc.height = cur.y + cur.height - acc.y;
+    }
+    return acc;
+  }, rect);
+}
+
 export interface Offset {
   x: number;
   y: number;
@@ -277,4 +418,5 @@ export interface Size {
 export interface CanvasWidget {
   rect: DOMRect;
   draw(ctx: CanvasRenderingContext2D, size: Size): void;
+  children?: CanvasWidget[];
 }
