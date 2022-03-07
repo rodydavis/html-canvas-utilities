@@ -39,9 +39,7 @@
     "build": "rm -rf dist && tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch"
   },
-  "dependencies": {
-    "lit": "^2.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^17.0.21",
     "rollup-plugin-typescript2": "^0.31.2",

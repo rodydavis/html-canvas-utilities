@@ -14,7 +14,7 @@ Abstract canvas controller that can take a set of drawable children and render t
 
 https://user-images.githubusercontent.com/31253215/156279985-b89cc58c-6549-491c-b641-b67fb9a4eae5.mov
 
-## Gestures
+## Features
 
 - Mouse wheel events
 - Keyboard navigation
@@ -23,6 +23,8 @@ https://user-images.githubusercontent.com/31253215/156279985-b89cc58c-6549-491c-
 - Mobile tap to select
 - Cursor changes
 - Theme API
+- Double tap to select child
+- Relative children
 
 ## Theme
 
