@@ -1,3 +1,12 @@
+## 0.0.7
+
+- Removing all dependencies
+- Updating example
+- Multi selection (with shift)
+- Move multi selection if hovered
+- Updating CSS Custom Properties from `--canvas-controller` to `--canvas`
+- Selected outlined outer rect
+
 ## 0.0.6
 
 - Fixed mobile touch scale gesture

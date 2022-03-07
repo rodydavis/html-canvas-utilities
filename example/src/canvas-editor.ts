@@ -7,10 +7,10 @@ import { addRandomShapes } from "./shapes.js";
 export class CanvasEditor extends LitElement {
   static styles = css`
     canvas {
-      --canvas-controller-background-color: #fafafa;
-      --canvas-controller-grid-color: #ccc;
-      --canvas-controller-selected-color: #f00;
-      --canvas-controller-hovered-color: #0f0;
+      --canvas-background-color: #fafafa;
+      --canvas-grid-color: #ccc;
+      --canvas-selected-color: #f00;
+      --canvas-hovered-color: #0f0;
       cursor: pointer;
       user-select: none;
       user-zoom: none;
@@ -22,10 +22,10 @@ export class CanvasEditor extends LitElement {
     }
     @media (prefers-color-scheme: dark) {
       canvas {
-        --canvas-controller-background-color: #333;
-        --canvas-controller-grid-color: #666;
-        --canvas-controller-selected-color: #bd0303;
-        --canvas-controller-hovered-color: #04a104;
+        --canvas-background-color: #333;
+        --canvas-grid-color: #666;
+        --canvas-selected-color: #bd0303;
+        --canvas-hovered-color: #04a104;
       }
     }
   `;
@@ -49,6 +49,31 @@ export class CanvasEditor extends LitElement {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     addRandomShapes(controller);
+    controller.addChild({
+      rect: new DOMRect(100, 100, 100, 100),
+      draw: (ctx, size) => {
+        ctx.fillStyle = "purple";
+        ctx.fillRect(0, 0, size.width, size.height);
+      },
+      children: [
+        {
+          rect: new DOMRect(25, 25, 50, 50),
+          draw: (ctx, size) => {
+            ctx.fillStyle = "yellow";
+            ctx.fillRect(0, 0, size.width, size.height);
+          },
+          children: [
+            {
+              rect: new DOMRect(12.5, 12.5, 25, 25),
+              draw: (ctx, size) => {
+                ctx.fillStyle = "magenta";
+                ctx.fillRect(0, 0, size.width, size.height);
+              },
+            },
+          ],
+        },
+      ],
+    });
     controller.clearSelection();
     controller.paint();
   }

@@ -29,19 +29,19 @@ https://user-images.githubusercontent.com/31253215/156279985-b89cc58c-6549-491c-
 Light Theme
 
 ```css
---canvas-controller-background-color: #fafafa;
---canvas-controller-grid-color: #ccc;
---canvas-controller-selected-color: #f00;
---canvas-controller-hovered-color: #0f0;
+--canvas-background-color: #fafafa;
+--canvas-grid-color: #ccc;
+--canvas-selected-color: #f00;
+--canvas-hovered-color: #0f0;
 ```
 
 Dark Theme
 
 ```css
---canvas-controller-background-color: #333;
---canvas-controller-grid-color: #666;
---canvas-controller-selected-color: #bd0303;
---canvas-controller-hovered-color: #04a104;
+--canvas-background-color: #333;
+--canvas-grid-color: #666;
+--canvas-selected-color: #bd0303;
+--canvas-hovered-color: #04a104;
 ```
 
 ## Example
@@ -70,6 +70,33 @@ controller.addChild({
     },
 });
 
+// Add a child with nested children relative to the parent
+controller.addChild({
+    rect: new DOMRect(100, 100, 100, 100),
+    draw: (ctx, size) => {
+      ctx.fillStyle = "purple";
+      ctx.fillRect(0, 0, size.width, size.height);
+    },
+    children: [
+      {
+        rect: new DOMRect(50, 50, 50, 50),
+        draw: (ctx, size) => {
+          ctx.fillStyle = "yellow";
+          ctx.fillRect(0, 0, size.width, size.height);
+        },
+        children: [
+          {
+            rect: new DOMRect(12.5, 12.5, 25, 25),
+            draw: (ctx, size) => {
+              ctx.fillStyle = "magenta";
+              ctx.fillRect(0, 0, size.width, size.height);
+            },
+          },
+        ],
+      },
+    ],
+});
+
 // Start the animation loop
 controller.paint();
 ```
@@ -86,19 +113,19 @@ import { addRandomShapes } from "./shapes";
 export class CanvasEditor extends LitElement {
   static styles = css`
     canvas {
-      --canvas-controller-background-color: #fafafa;
-      --canvas-controller-grid-color: #ccc;
-      --canvas-controller-selected-color: #f00;
-      --canvas-controller-hovered-color: #0f0;
+      --canvas-background-color: #fafafa;
+      --canvas-grid-color: #ccc;
+      --canvas-selected-color: #f00;
+      --canvas-hovered-color: #0f0;
       width: 100%;
       height: 100%;
     }
     @media (prefers-color-scheme: dark) {
       canvas {
-        --canvas-controller-background-color: #333;
-        --canvas-controller-grid-color: #666;
-        --canvas-controller-selected-color: #bd0303;
-        --canvas-controller-hovered-color: #04a104;
+        --canvas-background-color: #333;
+        --canvas-grid-color: #666;
+        --canvas-selected-color: #bd0303;
+        --canvas-hovered-color: #04a104;
       }
     }
   `;

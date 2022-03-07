@@ -71,6 +71,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
   spacePressed = false;
   controlPressed = false;
   shiftPressed = false;
+  metaPressed = false;
   middleClick = false;
 
   private transform: DOMMatrix;
@@ -302,6 +303,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
     }
     this.controlPressed = e.ctrlKey;
     this.shiftPressed = e.shiftKey;
+    this.metaPressed = e.metaKey;
     this.spacePressed = e.key === " ";
   }
 
@@ -310,6 +312,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
     this.controlPressed = false;
     this.spacePressed = false;
     this.shiftPressed = false;
+    this.metaPressed = false;
   }
 
   onDoubleClick(e: MouseEvent) {

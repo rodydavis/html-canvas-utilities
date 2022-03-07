@@ -51,15 +51,15 @@ export class CanvasController<
       return;
     }
     ctx.save();
-    ctx.fillStyle = color(canvas, "--canvas-controller-background-color");
+    ctx.fillStyle = color(canvas, "--canvas-background-color");
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (this.drawGrid) {
       drawInfiniteGrid(canvas, ctx, {
         offset,
         scale,
-        backgroundColor: "--canvas-controller-background-color",
-        gridColor: "--canvas-controller-grid-color",
+        backgroundColor: "--canvas-background-color",
+        gridColor: "--canvas-grid-color",
       });
     }
     ctx.restore();
@@ -88,6 +88,12 @@ export class CanvasController<
 
     // Draw content
     this.drawContent(ctx);
+
+    // Draw selection
+    if (this.selection.length > 1) {
+      const rect = outerRect(this.selection.map((item) => item.rect));
+      this.drawOutline(ctx, rect, "--canvas-selected-color");
+    }
 
     requestAnimationFrame(() => this.paint());
   }
@@ -119,15 +125,11 @@ export class CanvasController<
       ctx.restore();
     }
 
-    const outer = outerRect(getRects(child));
-    if (this.selection.includes(child)) {
-      this.drawOutline(ctx, outer, "--canvas-controller-selected-color");
-    } else if (this.hovered.includes(child)) {
-      this.drawOutline(ctx, outer, "--canvas-controller-hovered-color");
+    if (this.selection.length === 1 && this.selection[0] === child) {
+      this.drawOutline(ctx, rect, "--canvas-selected-color");
+    } else if (this.hovered.length === 1 && this.hovered[0] === child) {
+      this.drawOutline(ctx, rect, "--canvas-hovered-color");
     }
-
-    // // Outer Rect
-    // this.drawOutline(ctx, outer, "yellow");
   }
 
   drawOutline(
@@ -196,16 +198,26 @@ export class CanvasController<
 
   override onMouseDown(e: MouseEvent): void {
     super.onMouseDown(e);
-
-    if (this.canSelect) {
-      this.updateSelection(
-        this.getSelectionAt(this.mouse, {
-          max: 1,
-          level: this.selectIndex,
-        })
-      );
-    }
     this.middleClick = e.button === 1;
+    if (this.canSelect) {
+      if (this.selection.length > 0) {
+        const point = this.localPoint(this.mouse);
+        const outer = outerRect(this.selection.map((item) => item.rect));
+        if (
+          point.x >= outer.x &&
+          point.x <= outer.x + outer.width &&
+          point.y >= outer.y &&
+          point.y <= outer.y + outer.height
+        ) {
+          return;
+        }
+      }
+      const selection = this.getSelectionAt(this.mouse, {
+        max: 1,
+        level: this.selectIndex,
+      });
+      this.updateSelection(selection);
+    }
     this.updateCursor();
   }
 
@@ -229,7 +241,7 @@ export class CanvasController<
           const point = new DOMPoint(e.clientX, e.clientY);
           this.mouse = point;
           this.selectAt(point);
-        }, 300);
+        }, 200);
       }
     }
     this.isMoving = false;
@@ -273,12 +285,12 @@ export class CanvasController<
 
     if (!this.gestureEvent) {
       const touch = e.touches[0];
-      this.move(
-        new DOMPoint(
-          touch.clientX - currentTouch.clientX,
-          touch.clientY - currentTouch.clientY
-        )
+      const scale = this.info.scale;
+      const delta = new DOMPoint(
+        touch.clientX - currentTouch.clientX,
+        touch.clientY - currentTouch.clientY
       );
+      this.move(delta);
     }
   }
 
@@ -288,12 +300,10 @@ export class CanvasController<
     } else if (this.canMove && this.selection.length > 0) {
       const scale = this.info.scale;
       for (const widget of this.selection) {
-        const rect = widget.rect;
-        rect.x += delta.x / scale;
-        rect.y += delta.y / scale;
-        widget.rect = rect;
-        this.notify();
+        widget.rect.x += delta.x / scale;
+        widget.rect.y += delta.y / scale;
       }
+      this.notify();
     }
   }
 
@@ -301,6 +311,9 @@ export class CanvasController<
     super.onKeyDownEvent(e);
     if (e.key === "Backspace") {
       this.removeSelection();
+    }
+    if (e.metaKey && e.key === "a") {
+      this.updateSelection(this.children);
     }
     this.updateCursor();
   }
@@ -333,7 +346,16 @@ export class CanvasController<
   }
 
   updateSelection(selection: T[]) {
-    this.selection = selection;
+    if (this.shiftPressed) {
+      this.selection = this.selection.concat(selection);
+      // Remove duplicates
+      this.selection = this.selection.filter(
+        (w, i) => this.selection.indexOf(w) === i
+      );
+    } else {
+      this.selection = selection;
+    }
+    this.updateCursor();
     this.notify();
   }
 
