@@ -1,3 +1,14 @@
+## 0.0.08
+
+- Adding Shapes
+- Adding Star
+- Adding Rect
+- Adding Ellipse
+- Adding Polygon
+- Adding Line
+- Adding Image
+- Adding image smoothing options
+
 ## 0.0.7
 
 - Removing all dependencies

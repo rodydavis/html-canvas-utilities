@@ -5,6 +5,7 @@
     "removeComments": false,
     "declaration": true,
     "sourceMap": true,
+    "moduleResolution": "node",
     "module": "esnext",
     "target": "ES5",
     "lib": [

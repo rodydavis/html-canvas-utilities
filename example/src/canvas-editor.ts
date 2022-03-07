@@ -14,11 +14,6 @@ export class CanvasEditor extends LitElement {
       cursor: pointer;
       user-select: none;
       user-zoom: none;
-      /* min-height: 100vh; */
-      /* max-height: 100vh; */
-      /* min-width: 100vw; */
-      /* max-width: 100vw; */
-      /* min-height: -webkit-fill-available; */
     }
     @media (prefers-color-scheme: dark) {
       canvas {
@@ -37,19 +32,22 @@ export class CanvasEditor extends LitElement {
   }
 
   firstUpdated() {
-    const controller = new CanvasController(this.canvas);
+    const canvas = this.canvas;
+    const controller = new CanvasController(canvas);
     controller.addListener(() => {
       const { offset, scale } = controller.info;
       console.debug(`offset: ${offset.x}, ${offset.y}; scale: ${scale}`);
     });
     window.addEventListener("resize", () => {
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     });
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     addRandomShapes(controller);
     controller.clearSelection();
+    controller.canvasResize();
+    window.addEventListener("canvasResize", () => controller.resize());
     controller.paint();
   }
 }

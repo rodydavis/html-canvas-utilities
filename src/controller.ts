@@ -1,10 +1,11 @@
+import { CanvasWidget } from "./classes";
 import { drawInfiniteGrid } from "./infinite-grid";
 import {
   CanvasTransformer,
   CanvasTransformerOptions,
   defaultOptions,
 } from "./transformer";
-import { color } from "./utils";
+import { color, Offset, outerRect, Size } from "./utils";
 
 export interface CanvasControllerOptions extends CanvasTransformerOptions {
   drawBackground?: (
@@ -14,17 +15,27 @@ export interface CanvasControllerOptions extends CanvasTransformerOptions {
   ) => void;
   drawOutline?: (
     ctx: CanvasRenderingContext2D,
-    rect: DOMRect,
+    size: Size,
     strokeColor: string
   ) => void;
+  devicePixelRatio: number;
+  imageSmoothingEnabled: boolean;
+  imageSmoothingQuality: ImageSmoothingQuality;
 }
+
+const defaultControllerOptions: CanvasControllerOptions = {
+  ...defaultOptions,
+  devicePixelRatio: window.devicePixelRatio || 1,
+  imageSmoothingEnabled: true,
+  imageSmoothingQuality: "high",
+};
 
 export class CanvasController<
   T extends CanvasWidget = CanvasWidget
 > extends CanvasTransformer<T> {
   constructor(
     readonly canvas: HTMLCanvasElement = document.createElement("canvas"),
-    readonly options: CanvasControllerOptions = defaultOptions
+    readonly options: CanvasControllerOptions = defaultControllerOptions
   ) {
     super(canvas, options);
   }
@@ -68,14 +79,30 @@ export class CanvasController<
   resize() {
     const elem = this.canvas;
     const style = getComputedStyle(elem);
-    const { canvas } = this;
-    canvas.width = parseInt(style.width, 10);
-    canvas.height = parseInt(style.height, 10);
+    const { canvas, ctx } = this;
+    const width = parseInt(style.width, 10);
+    const height = parseInt(style.height, 10);
+    canvas.width = width;
+    canvas.height = height;
+  }
+
+  canvasResize() {
+    const { canvas, ctx } = this;
+    const rect = canvas.getBoundingClientRect();
+    const dpr = this.options.devicePixelRatio;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(dpr, dpr);
   }
 
   paint() {
     const { canvas, ctx } = this;
     this.resize();
+
+    // Set canvas options
+    ctx.imageSmoothingEnabled = this.options.imageSmoothingEnabled;
+    ctx.imageSmoothingQuality = this.options.imageSmoothingQuality;
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -89,10 +116,16 @@ export class CanvasController<
     // Draw content
     this.drawContent(ctx);
 
+    // Apply Transform
+    this.applyTransform(ctx);
+
     // Draw selection
     if (this.selection.length > 1) {
       const rect = outerRect(this.selection.map((item) => item.rect));
+      ctx.save();
+      ctx.translate(rect.x, rect.y);
       this.drawOutline(ctx, rect, "--canvas-selected-color");
+      ctx.restore();
     }
 
     requestAnimationFrame(() => this.paint());
@@ -105,48 +138,29 @@ export class CanvasController<
   }
 
   drawChild(ctx: CanvasRenderingContext2D, child: T, parent?: DOMRect) {
-    ctx.save();
     const rect = child.rect;
+    ctx.save();
     ctx.translate(rect.x, rect.y);
     child.draw(this.ctx, {
       width: rect.width,
       height: rect.height,
     });
+    child.drawDecoration(ctx, this.selection, this.hovered);
+    ctx.translate(-rect.x, -rect.y);
     ctx.restore();
-
-    if (child.children) {
-      ctx.save();
-      ctx.translate(rect.x, rect.y);
-      const children = child.children as T[];
-      for (const item of children) {
-        const rect = childRect(item.rect, parent);
-        this.drawChild(ctx, item, rect);
-      }
-      ctx.restore();
-    }
-
-    if (this.selection.length === 1 && this.selection[0] === child) {
-      this.drawOutline(ctx, rect, "--canvas-selected-color");
-    } else if (this.hovered.length === 1 && this.hovered[0] === child) {
-      this.drawOutline(ctx, rect, "--canvas-hovered-color");
-    }
   }
 
-  drawOutline(
-    ctx: CanvasRenderingContext2D,
-    rect: DOMRect,
-    strokeColor: string
-  ) {
+  drawOutline(ctx: CanvasRenderingContext2D, size: Size, strokeColor: string) {
     const { canvas } = this;
     if (this.options.drawOutline !== undefined) {
       ctx.save();
-      this.options.drawOutline(ctx, rect, strokeColor);
+      this.options.drawOutline(ctx, size, strokeColor);
       ctx.restore();
       return;
     }
     ctx.save();
     ctx.strokeStyle = color(canvas, strokeColor);
-    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    ctx.strokeRect(0, 0, size.width, size.height);
     ctx.restore();
   }
 
@@ -159,40 +173,16 @@ export class CanvasController<
   ) {
     const localPoint = this.localPoint(point);
     const selection: T[] = [];
-
-    const searchChildren = (items: T[], level = 0, parent?: DOMRect) => {
-      const children = Array.from(items).reverse();
-      for (const child of children) {
-        const rect = childRect(child.rect, parent);
-        const mainRect = outerRect(getRects(child));
-        if (
-          localPoint.x >= mainRect.x &&
-          localPoint.x <= mainRect.x + mainRect.width &&
-          localPoint.y >= mainRect.y &&
-          localPoint.y <= mainRect.y + mainRect.height
-        ) {
-          if (level === options.level) {
-            selection.push(child);
-            continue;
-          }
-        } else if (
-          localPoint.x >= rect.x &&
-          localPoint.x <= rect.x + rect.width &&
-          localPoint.y >= rect.y &&
-          localPoint.y <= rect.y + rect.height
-        ) {
-          if (level === options.level) {
-            selection.push(child);
-            continue;
-          }
-        }
-        if (child.children) {
-          const subItems = child.children as T[];
-          searchChildren(subItems, level + 1, rect);
+    let level = this.selectIndex + 1;
+    while (selection.length === 0 && level > -1) {
+      level--;
+      for (const child of Array.from(this.children).reverse()) {
+        const hit = child.selectAt(localPoint, level);
+        if (hit) {
+          selection.push(hit as T);
         }
       }
-    };
-    searchChildren(this.children);
+    }
     return selection.slice(0, options.max);
   }
 
@@ -389,56 +379,11 @@ function getRects(child: CanvasWidget, parent?: DOMRect) {
   const rects: DOMRect[] = [];
   const rect = childRect(child.rect, parent);
   rects.push(rect);
-  if (child.children) {
-    const children = child.children as CanvasWidget[];
-    for (const item of children) {
-      rects.push(...getRects(item, rect));
-    }
-  }
+  // if (child instanceof GroupBase) {
+  //   const children = child.children as CanvasWidget[];
+  //   for (const item of children) {
+  //     rects.push(...getRects(item, rect));
+  //   }
+  // }
   return rects;
-}
-
-function outerRect(rects: DOMRect[]) {
-  if (rects.length === 0) {
-    return new DOMRect(0, 0, 0, 0);
-  }
-  const rect = new DOMRect(
-    rects[0].x,
-    rects[0].y,
-    rects[0].width,
-    rects[0].height
-  );
-  return rects.reduce((acc, cur) => {
-    if (cur.x < acc.x) {
-      acc.width += acc.x - cur.x;
-      acc.x = cur.x;
-    }
-    if (cur.y < acc.y) {
-      acc.height += acc.y - cur.y;
-      acc.y = cur.y;
-    }
-    if (cur.x + cur.width > acc.x + acc.width) {
-      acc.width = cur.x + cur.width - acc.x;
-    }
-    if (cur.y + cur.height > acc.y + acc.height) {
-      acc.height = cur.y + cur.height - acc.y;
-    }
-    return acc;
-  }, rect);
-}
-
-export interface Offset {
-  x: number;
-  y: number;
-}
-
-export interface Size {
-  width: number;
-  height: number;
-}
-
-export interface CanvasWidget {
-  rect: DOMRect;
-  draw(ctx: CanvasRenderingContext2D, size: Size): void;
-  children?: CanvasWidget[];
 }
