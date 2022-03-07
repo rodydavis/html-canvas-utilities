@@ -214,29 +214,32 @@ export class CanvasController<
   override onMouseUp(e: MouseEvent): void {
     super.onMouseUp(e);
     if (this.canSelect && !this.isMoving) {
-      // Check for dbclick delay
-      if (this.dblClickTimeout !== undefined) {
-        clearTimeout(this.dblClickTimeout);
-        this.dblClickTimeout = undefined;
-        // Double click
-        this.selectIndex += 1;
-        const point = new DOMPoint(e.clientX, e.clientY);
-        this.mouse = point;
-        this.selectAt(point);
-      } else {
-        this.dblClickTimeout = window.setTimeout(() => {
-          this.dblClickTimeout = undefined;
-          // Single click
-          this.selectIndex = 0;
-          const point = new DOMPoint(e.clientX, e.clientY);
-          this.mouse = point;
-          this.selectAt(point);
-        }, 200);
-      }
+      const point = new DOMPoint(e.clientX, e.clientY);
+      this.doubleClickAt(point);
     }
     this.isMoving = false;
     this.middleClick = false;
     this.updateCursor();
+  }
+
+  doubleClickAt(point: DOMPoint) {
+    // Check for dbclick delay
+    if (this.dblClickTimeout !== undefined) {
+      clearTimeout(this.dblClickTimeout);
+      this.dblClickTimeout = undefined;
+      // Double click
+      this.selectIndex += 1;
+      this.mouse = point;
+      this.selectAt(point);
+    } else {
+      this.dblClickTimeout = window.setTimeout(() => {
+        this.dblClickTimeout = undefined;
+        // Single click
+        this.selectIndex = 0;
+        this.mouse = point;
+        this.selectAt(point);
+      }, 200);
+    }
   }
 
   override onMouseMove(e: MouseEvent): void {
@@ -264,8 +267,7 @@ export class CanvasController<
     if (!this.gestureEvent && this.canSelect) {
       const touch = e.touches[0];
       const point = new DOMPoint(touch.clientX, touch.clientY);
-      this.selectIndex = 0;
-      this.selectAt(point);
+      this.doubleClickAt(point);
     }
   }
 
@@ -363,27 +365,4 @@ export class CanvasController<
     this.children.push(widget);
     this.updateSelection([widget]);
   }
-}
-
-function childRect(main: DOMRect, parent?: DOMRect) {
-  if (!parent) return main;
-  return new DOMRect(
-    parent.x + main.x,
-    parent.y + main.y,
-    main.width,
-    main.height
-  );
-}
-
-function getRects(child: CanvasWidget, parent?: DOMRect) {
-  const rects: DOMRect[] = [];
-  const rect = childRect(child.rect, parent);
-  rects.push(rect);
-  // if (child instanceof GroupBase) {
-  //   const children = child.children as CanvasWidget[];
-  //   for (const item of children) {
-  //     rects.push(...getRects(item, rect));
-  //   }
-  // }
-  return rects;
 }

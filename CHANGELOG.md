@@ -1,3 +1,7 @@
+## 0.0.9
+
+- Fixing mobile double click
+
 ## 0.0.8
 
 - Adding Shapes
