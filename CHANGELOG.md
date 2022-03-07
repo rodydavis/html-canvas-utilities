@@ -1,13 +1,17 @@
-## 0.0.08
+## 0.0.8
 
 - Adding Shapes
-- Adding Star
-- Adding Rect
-- Adding Ellipse
-- Adding Polygon
-- Adding Line
-- Adding Image
-- Adding image smoothing options
+    - Star
+    - Rect
+    - Ellipse
+    - Polygon
+    - Line
+    - Image
+        - Smoothing options
+- Adding Group
+    - Stack
+- Updating Example
+- Adding Box
 
 ## 0.0.7
 

@@ -115,4 +115,27 @@ export function addRandomShapes(controller: CanvasController) {
       ],
     })
   );
+
+  // // Add flex
+  // controller.addChild(
+  //   new BoxBase({
+  //     rect: new DOMRect(0, 0, 100, 100),
+  //     child: new RowBase({
+  //       children: [
+  //         new RectShape({
+  //           rect: new DOMRect(0, 0, 30, 30),
+  //           fillColor: "yellow",
+  //         }),
+  //         new RectShape({
+  //           rect: new DOMRect(0, 0, 30, 30),
+  //           fillColor: "green",
+  //         }),
+  //         new RectShape({
+  //           rect: new DOMRect(0, 0, 30, 30),
+  //           fillColor: "purple",
+  //         }),
+  //       ],
+  //     }),
+  //   })
+  // );
 }

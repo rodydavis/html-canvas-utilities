@@ -2,7 +2,7 @@ import { color, drawOutline, Size } from "../utils.js";
 
 export abstract class CanvasWidget {
   abstract rect: DOMRect;
-  abstract draw(ctx: CanvasRenderingContext2D, size: Size): void;
+  abstract draw(ctx: CanvasRenderingContext2D, size: Size, parent?: Size): void;
 
   selectAt(point: DOMPoint, level: number): CanvasWidget | null {
     const rect = this.rect;

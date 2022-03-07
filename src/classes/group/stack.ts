@@ -27,7 +27,7 @@ export class StackGroup extends GroupBase {
     }
     for (const item of this.children) {
       ctx.translate(item.rect.x, item.rect.y);
-      item.draw(ctx, item.rect);
+      item.draw(ctx, item.rect, this.rect);
       ctx.translate(-item.rect.x, -item.rect.y);
     }
     ctx.restore();
