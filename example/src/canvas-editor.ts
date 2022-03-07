@@ -49,31 +49,6 @@ export class CanvasEditor extends LitElement {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     addRandomShapes(controller);
-    controller.addChild({
-      rect: new DOMRect(100, 100, 100, 100),
-      draw: (ctx, size) => {
-        ctx.fillStyle = "purple";
-        ctx.fillRect(0, 0, size.width, size.height);
-      },
-      children: [
-        {
-          rect: new DOMRect(25, 25, 50, 50),
-          draw: (ctx, size) => {
-            ctx.fillStyle = "yellow";
-            ctx.fillRect(0, 0, size.width, size.height);
-          },
-          children: [
-            {
-              rect: new DOMRect(12.5, 12.5, 25, 25),
-              draw: (ctx, size) => {
-                ctx.fillStyle = "magenta";
-                ctx.fillRect(0, 0, size.width, size.height);
-              },
-            },
-          ],
-        },
-      ],
-    });
     controller.clearSelection();
     controller.paint();
   }

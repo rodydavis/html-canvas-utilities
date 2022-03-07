@@ -23,8 +23,9 @@ https://user-images.githubusercontent.com/31253215/156279985-b89cc58c-6549-491c-
 - Mobile tap to select
 - Cursor changes
 - Theme API
-- Double tap to select child
+- Double tap to select nested child
 - Relative children
+- Multi selection
 
 ## Theme
 
