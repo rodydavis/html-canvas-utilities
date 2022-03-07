@@ -1,4 +1,4 @@
-import { color, drawOutline, Size } from "../utils.js";
+import { drawOutline, Size } from "../utils.js";
 
 export abstract class CanvasWidget {
   abstract rect: DOMRect;

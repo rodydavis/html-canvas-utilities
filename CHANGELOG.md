@@ -1,3 +1,7 @@
+## 0.1.0
+
+- Adding padding and margin to box
+
 ## 0.0.9
 
 - Fixing mobile double click

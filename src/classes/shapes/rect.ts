@@ -19,7 +19,6 @@ export class RectShape extends ShapeBase {
   strokeColor = this.options.strokeColor;
   rect = this.options.rect;
   cornerRadius?: RectCornerRadius = this.options.cornerRadius;
-  children?: CanvasWidget[];
 
   draw(ctx: CanvasRenderingContext2D, size: Size): void {
     ctx.save();
