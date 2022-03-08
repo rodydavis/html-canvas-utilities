@@ -1,6 +1,6 @@
 ## 0.1.0
 
-- Adding padding and margin to box
+- Adding padding to box
 
 ## 0.0.9
 
