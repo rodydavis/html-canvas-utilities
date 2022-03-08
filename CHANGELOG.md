@@ -1,3 +1,7 @@
+## 0.1.0
+
+- New resize, move and rect getters to widget
+
 ## 0.0.9
 
 - Fixing mobile double click

@@ -1,7 +1,6 @@
-import { color, drawOutline, Size } from "../utils.js";
+import { color, drawOutline, Offset, Rect, Size } from "../utils.js";
 
 export abstract class CanvasWidget {
-  abstract rect: DOMRect;
   abstract draw(ctx: CanvasRenderingContext2D, size: Size, parent?: Size): void;
 
   selectAt(point: DOMPoint, level: number): CanvasWidget | null {
@@ -28,4 +27,32 @@ export abstract class CanvasWidget {
       drawOutline(ctx, this.rect, "--canvas-hovered-color");
     }
   }
+
+  move(delta: Offset) {
+    this.rect.x += delta.x;
+    this.rect.y += delta.y;
+  }
+
+  resize(size: Size) {
+    this.rect.width = size.width;
+    this.rect.height = size.height;
+  }
+
+  get size(): Size {
+    return {
+      width: this.rect.width,
+      height: this.rect.height,
+    };
+  }
+
+  get offset(): Offset {
+    return {
+      x: this.rect.x,
+      y: this.rect.y,
+    };
+  }
+
+  inflate(parent?: Rect): void {}
+
+  abstract get rect(): Rect;
 }
