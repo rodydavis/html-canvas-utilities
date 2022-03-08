@@ -20,12 +20,14 @@ export abstract class CanvasWidget {
   drawDecoration(
     ctx: CanvasRenderingContext2D,
     selection: CanvasWidget[],
-    hovered: CanvasWidget[]
+    hovered: CanvasWidget[],
+    size?: Size
   ) {
+    const rect = size ?? this.rect;
     if (selection.length > 0 && selection.includes(this)) {
-      drawOutline(ctx, this.rect, "--canvas-selected-color");
+      drawOutline(ctx, rect, "--canvas-selected-color");
     } else if (hovered.length > 0 && hovered.includes(this)) {
-      drawOutline(ctx, this.rect, "--canvas-hovered-color");
+      drawOutline(ctx, rect, "--canvas-hovered-color");
     }
   }
 }
