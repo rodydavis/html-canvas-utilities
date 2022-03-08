@@ -1,6 +1,7 @@
 ## 0.1.0
 
 - Adding padding to box
+- New resize, move and rect getters to widget
 
 ## 0.0.9
 

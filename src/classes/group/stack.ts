@@ -1,4 +1,4 @@
-import { Offset, Size } from "../../utils.js";
+import { Size } from "../../utils.js";
 import { CanvasWidget } from "../widget.js";
 import { GroupBase } from "./base.js";
 
@@ -60,3 +60,17 @@ export class StackGroup extends GroupBase {
     }
   }
 }
+
+// export class Positioned {
+//   constructor(
+//     readonly options: {
+//       child: CanvasWidget;
+//       top?: number;
+//       left?: number;
+//       bottom?: number;
+//       right?: number;
+//       width?: number;
+//       height?: number;
+//     }
+//   ) {}
+// }
