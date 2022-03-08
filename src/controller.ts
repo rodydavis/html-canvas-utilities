@@ -138,15 +138,12 @@ export class CanvasController<
   }
 
   drawChild(ctx: CanvasRenderingContext2D, child: T, parent?: DOMRect) {
-    const rect = child.rect;
+    const offset = child.offset;
     ctx.save();
-    ctx.translate(rect.x, rect.y);
-    child.draw(this.ctx, {
-      width: rect.width,
-      height: rect.height,
-    });
+    ctx.translate(offset.x, offset.y);
+    child.draw(this.ctx, child.size);
     child.drawDecoration(ctx, this.selection, this.hovered);
-    ctx.translate(-rect.x, -rect.y);
+    ctx.translate(-offset.x, -offset.y);
     ctx.restore();
   }
 
@@ -277,7 +274,6 @@ export class CanvasController<
 
     if (!this.gestureEvent) {
       const touch = e.touches[0];
-      const scale = this.info.scale;
       const delta = new DOMPoint(
         touch.clientX - currentTouch.clientX,
         touch.clientY - currentTouch.clientY
@@ -292,8 +288,10 @@ export class CanvasController<
     } else if (this.canMove && this.selection.length > 0) {
       const scale = this.info.scale;
       for (const widget of this.selection) {
-        widget.rect.x += delta.x / scale;
-        widget.rect.y += delta.y / scale;
+        widget.move({
+          x: delta.x / scale,
+          y: delta.y / scale,
+        });
       }
       this.notify();
     }
