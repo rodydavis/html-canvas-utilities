@@ -6,7 +6,7 @@ export function color(elem: HTMLElement, value: string) {
   return value || "";
 }
 
-export function outerRect(rects: DOMRect[]) {
+export function outerRect(rects: Rect[]) {
   if (rects.length === 0) {
     return new DOMRect(0, 0, 0, 0);
   }
@@ -55,3 +55,5 @@ export interface Size {
   width: number;
   height: number;
 }
+
+export type Rect = Offset & Size;

@@ -121,9 +121,8 @@ export function addRandomShapes(controller: CanvasController) {
   controller.addChild(
     new BoxBase({
       rect: new DOMRect(0, 0, 100, 100),
-      fillColor: "red",
+      fillColor: "gray",
       padding: 10,
-      margin: 5,
       child: new RectShape({
         rect: new DOMRect(0, 0, 100, 100),
         fillColor: "purple",
