@@ -1,6 +1,8 @@
 ## 0.1.0
 
 - Adding padding and margin to box
+- Adding image filter
+- Adding zoomIn, zoomOut, reset
 
 ## 0.0.9
 
