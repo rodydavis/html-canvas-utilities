@@ -122,7 +122,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
    * @param delta Scale delta
    * @param origin Origin to scale at
    */
-  scale(scale: number, origin: DOMPoint = new DOMPoint(0, 0)) {
+  scale(scale: number, origin?: DOMPoint) {
     if (Number.isNaN(scale)) return;
     const amount = scale * this.info.scale;
     this.options.scale = amount;
@@ -130,9 +130,22 @@ export class CanvasTransformer<T> extends Listenable<T> {
     if (amount < this.minScale || amount > this.maxScale) {
       return;
     }
-    const point = this.localPoint(origin);
+    const center = origin || this.mouse;
+    const point = this.localPoint(center);
     this.matrix = this.matrix.scale(scale, scale, 0, point.x, point.y, point.z);
     this.notify();
+  }
+
+  zoomIn() {
+    this.scale(1.1);
+  }
+
+  zoomOut() {
+    this.scale(0.9);
+  }
+
+  reset() {
+    this.matrix = new DOMMatrix();
   }
 
   /**
