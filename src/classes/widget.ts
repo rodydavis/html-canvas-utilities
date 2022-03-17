@@ -1,6 +1,8 @@
+import { CanvasEvent, ClickEvent, HoverEvent } from "../events.js";
+import { Listenable } from "../listenable.js";
 import { drawOutline, Offset, Rect, Size } from "../utils.js";
 
-export abstract class CanvasWidget {
+export abstract class CanvasWidget extends Listenable<CanvasEvent> {
   abstract draw(ctx: CanvasRenderingContext2D, size: Size, parent?: Size): void;
 
   selectAt(point: DOMPoint, level: number): CanvasWidget | null {
@@ -54,7 +56,21 @@ export abstract class CanvasWidget {
     };
   }
 
-  inflate(parent?: Rect): void {}
-
   abstract get rect(): Rect;
+
+  onClick(point: DOMPoint) {
+    const event: ClickEvent = {
+      type: "click",
+      offset: { x: point.x, y: point.y },
+    };
+    this.notifyListeners(event);
+  }
+
+  onHover(point: DOMPoint) {
+    const event: HoverEvent = {
+      type: "hover",
+      offset: { x: point.x, y: point.y },
+    };
+    this.notifyListeners(event);
+  }
 }

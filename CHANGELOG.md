@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Adding tests
+
 ## 0.1.0
 
 - Adding padding to box
