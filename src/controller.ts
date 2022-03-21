@@ -1,6 +1,7 @@
-import { CanvasWidget } from "./classes";
+import { CanvasContext, CanvasWidget } from "./classes";
 import { drawInfiniteGrid } from "./infinite-grid";
 import {
+  CanvasInfo,
   CanvasTransformer,
   CanvasTransformerOptions,
   defaultOptions,
@@ -62,13 +63,11 @@ export class CanvasController<
       return;
     }
     ctx.save();
-    ctx.fillStyle = color(canvas, "--canvas-background-color");
+    ctx.fillStyle = this.resolveValue(canvas, "--canvas-background-color");
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (this.drawGrid) {
-      drawInfiniteGrid(canvas, ctx, {
-        offset,
-        scale,
+      drawInfiniteGrid(this.getContext(ctx), {
         backgroundColor: "--canvas-background-color",
         gridColor: "--canvas-grid-color",
       });
@@ -124,7 +123,7 @@ export class CanvasController<
       const rect = outerRect(this.selection.map((item) => item.rect));
       ctx.save();
       ctx.translate(rect.x, rect.y);
-      this.drawOutline(ctx, rect, "--canvas-selected-color");
+      this.drawOutline(this.getContext(ctx), "--canvas-selected-color");
       ctx.restore();
     }
 
@@ -137,17 +136,34 @@ export class CanvasController<
     }
   }
 
-  drawChild(ctx: CanvasRenderingContext2D, child: T, parent?: DOMRect) {
+  drawChild(ctx: CanvasRenderingContext2D, child: T) {
     const offset = child.offset;
     ctx.save();
     ctx.translate(offset.x, offset.y);
-    child.draw(this.ctx, child.size);
-    child.drawDecoration(ctx, this.selection, this.hovered);
+    const context = this.getContext(ctx);
+    child.draw({
+      ...context,
+      size: child.size,
+    });
+    child.drawDecoration(context, this.selection, this.hovered);
     ctx.translate(-offset.x, -offset.y);
     ctx.restore();
   }
 
-  drawOutline(ctx: CanvasRenderingContext2D, size: Size, strokeColor: string) {
+  getContext(ctx: CanvasRenderingContext2D) {
+    return {
+      ctx,
+      size: {
+        width: this.canvas.width,
+        height: this.canvas.height,
+      },
+      resolveValue: (key: string) => this.resolveValue(ctx.canvas, key),
+      ...this.info,
+    };
+  }
+
+  drawOutline(context: CanvasContext, strokeColor: string) {
+    const { ctx, size } = context;
     const { canvas } = this;
     if (this.options.drawOutline !== undefined) {
       ctx.save();
@@ -156,7 +172,7 @@ export class CanvasController<
       return;
     }
     ctx.save();
-    ctx.strokeStyle = color(canvas, strokeColor);
+    ctx.strokeStyle = this.resolveValue(canvas, strokeColor);
     ctx.strokeRect(0, 0, size.width, size.height);
     ctx.restore();
   }
@@ -217,6 +233,14 @@ export class CanvasController<
     this.isMoving = false;
     this.middleClick = false;
     this.updateCursor();
+  }
+
+  resolveValue(elem: HTMLElement, value: string): string {
+    if (value.startsWith("--")) {
+      const s = getComputedStyle(elem ?? document.body);
+      return s.getPropertyValue(value);
+    }
+    return value;
   }
 
   doubleClickAt(point: DOMPoint) {

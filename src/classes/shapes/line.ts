@@ -1,5 +1,5 @@
 import { color, Size } from "../../utils.js";
-import { CanvasWidget } from "../widget.js";
+import { CanvasContext, CanvasWidget } from "../widget.js";
 import { ShapeBase } from "./base.js";
 
 export class LineBase extends ShapeBase {
@@ -17,14 +17,15 @@ export class LineBase extends ShapeBase {
   rect = this.options.rect;
   children?: CanvasWidget[];
 
-  draw(ctx: CanvasRenderingContext2D, size: Size): void {
+  draw(context: CanvasContext): void {
+    const { ctx, size } = context;
     ctx.save();
     ctx.lineWidth = this.lineWidth;
     if (this.fillColor) {
-      ctx.fillStyle = color(ctx.canvas, this.fillColor);
+      ctx.fillStyle = context.resolveValue(this.fillColor);
     }
     if (this.strokeColor) {
-      ctx.strokeStyle = color(ctx.canvas, this.strokeColor);
+      ctx.strokeStyle = context.resolveValue(this.strokeColor);
     }
     const { width } = size;
 

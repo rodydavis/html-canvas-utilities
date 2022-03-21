@@ -1,5 +1,5 @@
 import { color, Size } from "../../utils.js";
-import { CanvasWidget } from "../widget.js";
+import { CanvasContext, CanvasWidget } from "../widget.js";
 import { PolygonShape } from "./polygon.js";
 
 export class StarShape extends PolygonShape {
@@ -23,14 +23,15 @@ export class StarShape extends PolygonShape {
   outerRadius = this.options.outerRadius;
   children?: CanvasWidget[];
 
-  override draw(ctx: CanvasRenderingContext2D, size: Size): void {
+  override draw(context: CanvasContext): void {
+    const { ctx, size } = context;
     ctx.save();
     ctx.lineWidth = this.lineWidth;
     if (this.fillColor) {
-      ctx.fillStyle = color(ctx.canvas, this.fillColor);
+      ctx.fillStyle = context.resolveValue(this.fillColor);
     }
     if (this.strokeColor) {
-      ctx.strokeStyle = color(ctx.canvas, this.strokeColor);
+      ctx.strokeStyle = context.resolveValue(this.strokeColor);
     }
     const { width, height } = size;
     const radiusX = width / 2;

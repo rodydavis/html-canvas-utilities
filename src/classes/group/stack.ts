@@ -1,5 +1,5 @@
 import { Size } from "../../utils.js";
-import { CanvasWidget } from "../widget.js";
+import { CanvasContext, CanvasWidget } from "../widget.js";
 import { GroupBase } from "./base.js";
 
 export class StackGroup extends GroupBase {
@@ -17,7 +17,8 @@ export class StackGroup extends GroupBase {
   rect = this.options.rect;
   clip = this.options.clip ?? true;
 
-  draw(ctx: CanvasRenderingContext2D, size: Size): void {
+  draw(context: CanvasContext): void {
+    const { ctx, size } = context;
     ctx.save();
     if (this.clip) {
       ctx.save();
@@ -27,7 +28,7 @@ export class StackGroup extends GroupBase {
     }
     for (const item of this.children) {
       ctx.translate(item.rect.x, item.rect.y);
-      item.draw(ctx, item.rect, this.rect);
+      item.draw({ ...context, size: item.rect });
       ctx.translate(-item.rect.x, -item.rect.y);
     }
     ctx.restore();
@@ -48,14 +49,16 @@ export class StackGroup extends GroupBase {
   }
 
   drawDecoration(
-    ctx: CanvasRenderingContext2D,
+    context: CanvasContext,
     selection: CanvasWidget[],
     hovered: CanvasWidget[]
   ): void {
-    super.drawDecoration(ctx, selection, hovered);
+    const { ctx } = context;
+    const newContext = { ...context, size: this.rect };
+    super.drawDecoration(newContext, selection, hovered);
     for (const item of this.children) {
       ctx.translate(item.rect.x, item.rect.y);
-      item.drawDecoration(ctx, selection, hovered);
+      item.drawDecoration(newContext, selection, hovered);
       ctx.translate(-item.rect.x, -item.rect.y);
     }
   }

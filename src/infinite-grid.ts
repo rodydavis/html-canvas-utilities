@@ -1,29 +1,27 @@
-import { color } from "./utils";
+import { CanvasContext } from "./classes/widget";
 
 export function drawInfiniteGrid(
-  canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  context: CanvasContext,
   options: {
-    offset: { x: number; y: number };
-    scale: number;
     backgroundColor: string;
     gridColor: string;
   }
 ) {
-  const { offset, scale, backgroundColor, gridColor } = options;
-
+  const { ctx, size, scale, offset } = context;
+  const { backgroundColor, gridColor } = options;
+  const canvas = ctx.canvas;
   ctx.save();
 
   const gridSize = 20 * scale;
   const gridOffsetX = Math.round(offset.x) % gridSize;
   const gridOffsetY = Math.round(offset.y) % gridSize;
 
-  ctx.fillStyle = color(canvas, backgroundColor);
+  ctx.fillStyle = context.resolveValue(backgroundColor);
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.strokeStyle = color(canvas, gridColor);
+  ctx.strokeStyle = context.resolveValue(gridColor);
   ctx.lineWidth = 0.23 * scale;
-//   ctx.setLineDash([5, 5]);
+  //   ctx.setLineDash([5, 5]);
 
   for (let x = gridOffsetX; x < canvas.width; x += gridSize) {
     ctx.beginPath();

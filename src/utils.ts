@@ -1,3 +1,5 @@
+import { CanvasContext } from "./classes/widget";
+
 export function color(elem: HTMLElement, value: string) {
   if (value.startsWith("--")) {
     const style = getComputedStyle(elem);
@@ -35,13 +37,10 @@ export function outerRect(rects: Rect[]) {
   }, rect);
 }
 
-export function drawOutline(
-  ctx: CanvasRenderingContext2D,
-  size: Size,
-  strokeColor: string
-) {
+export function drawOutline(context: CanvasContext, strokeColor: string) {
+  const { ctx, size } = context;
   ctx.save();
-  ctx.strokeStyle = color(ctx.canvas, strokeColor);
+  ctx.strokeStyle = context.resolveValue(strokeColor);
   ctx.strokeRect(0, 0, size.width, size.height);
   ctx.restore();
 }

@@ -1,48 +1,51 @@
 import { drawOutline, Size } from "../utils.js";
 import { RectShape } from "./shapes/index.js";
-import { CanvasWidget } from "./widget.js";
+import { CanvasContext, CanvasWidget } from "./widget.js";
 
 export type EdgeInsets = number | [number, number, number, number];
 
+export interface BoxOptions {
+  rect: DOMRect;
+  fillColor?: string;
+  strokeColor?: string;
+  padding?: EdgeInsets;
+  child: CanvasWidget;
+}
+
 export class BoxBase extends RectShape {
-  constructor(
-    readonly options: {
-      rect: DOMRect;
-      fillColor?: string;
-      strokeColor?: string;
-      padding?: EdgeInsets;
-      child: CanvasWidget;
-    }
-  ) {
+  constructor(readonly options: BoxOptions) {
     super(options);
   }
 
   child = this.options.child;
   padding = this.options.padding;
 
-  draw(ctx: CanvasRenderingContext2D, size: Size): void {
+  draw(context: CanvasContext): void {
+    const { ctx, size } = context;
     let childSize = { ...size };
-    super.draw(ctx, childSize);
+    super.draw(context);
     edgeInset(this.padding, (top, left, bottom, right) => {
       ctx.translate(left, top);
       childSize.width -= left + right;
       childSize.height -= top + bottom;
     });
-    this.child.draw(ctx, childSize, this.rect);
+    this.child.draw(context);
   }
 
   override drawDecoration(
-    ctx: CanvasRenderingContext2D,
+    context: CanvasContext,
     selection: CanvasWidget[],
     hovered: CanvasWidget[]
   ) {
+    const { ctx } = context;
     edgeInset(this.padding, (top, left) => {
       ctx.translate(-left, -top);
     });
+    const newContext = { ...context, size: this.rect };
     if (selection.length > 0 && selection.includes(this)) {
-      drawOutline(ctx, this.rect, "--canvas-selected-color");
+      drawOutline(newContext, "--canvas-selected-color");
     } else if (hovered.length > 0 && hovered.includes(this)) {
-      drawOutline(ctx, this.rect, "--canvas-hovered-color");
+      drawOutline(newContext, "--canvas-hovered-color");
     }
     let childSize = { width: this.rect.width, height: this.rect.height };
     edgeInset(this.padding, (top, left, bottom, right) => {
@@ -50,7 +53,14 @@ export class BoxBase extends RectShape {
       childSize.width -= left + right;
       childSize.height -= top + bottom;
     });
-    this.child.drawDecoration(ctx, selection, hovered, childSize);
+    this.child.drawDecoration(
+      {
+        ...newContext,
+        size: childSize,
+      },
+      selection,
+      hovered
+    );
   }
 
   selectAt(point: DOMPoint, level: number): CanvasWidget {

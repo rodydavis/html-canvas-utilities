@@ -9,6 +9,7 @@ import {
   RectShape,
   StackGroup,
   StarShape,
+  Frame,
 } from "html-canvas-utilities";
 
 export function addRandomShapes(controller: CanvasController) {
@@ -120,7 +121,7 @@ export function addRandomShapes(controller: CanvasController) {
   // Add flex
   controller.addChild(
     new BoxBase({
-      rect: new DOMRect(0, 0, 100, 100),
+      rect: new DOMRect(1000, 1000, 100, 100),
       fillColor: "gray",
       padding: 10,
       child: new RectShape({
@@ -145,5 +146,18 @@ export function addRandomShapes(controller: CanvasController) {
     //       }),
     //     ],
     //   }),
+  );
+  controller.addChild(
+    new Frame({
+      label: "Frame",
+      rect: new DOMRect(0, 0, 100, 100),
+      fillColor: "gray",
+      padding: 10,
+      child: new RectShape({
+        rect: new DOMRect(0, 0, 100, 100),
+        fillColor: "purple",
+        cornerRadius: 5,
+      }),
+    })
   );
 }

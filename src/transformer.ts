@@ -153,7 +153,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
     this.notify();
   }
 
-  get info() {
+  get info(): CanvasInfo {
     const { scaleX, scaleY, translateX, translateY, rotate } = decomposeMatrix(
       this.matrix
     );
@@ -354,4 +354,12 @@ function decomposeMatrix(m: DOMMatrix) {
 
 function distance(a: DOMPoint, b: DOMPoint): number {
   return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+}
+
+export interface CanvasInfo {
+  scale: number;
+  offset: DOMPoint;
+  rotation: number;
+  mouse: DOMPoint;
+  mouseDown: boolean;
 }
