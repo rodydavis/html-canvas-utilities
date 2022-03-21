@@ -1,5 +1,6 @@
 import { CanvasEvent, ClickEvent, HoverEvent } from "../events.js";
 import { Listenable } from "../listenable.js";
+import { CanvasInfo } from "../transformer.js";
 import { drawOutline, Offset, Rect, Size } from "../utils.js";
 
 export abstract class CanvasWidget extends Listenable<CanvasEvent> {
