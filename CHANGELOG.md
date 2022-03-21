@@ -1,5 +1,12 @@
+## 0.1.1
+
+- Adding tests
+
 ## 0.1.0
 
+- Adding padding and margin to box
+- Adding image filter
+- Adding zoomIn, zoomOut, reset
 - Adding padding to box
 - New resize, move and rect getters to widget
 

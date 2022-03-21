@@ -10,6 +10,7 @@ export class ImageShape extends RectShape {
       strokeColor?: string;
       cornerRadius?: RectCornerRadius;
       image: string;
+      filter?: string;
       smoothingEnabled?: boolean;
       smoothingQuality?: ImageSmoothingQuality;
     }
@@ -32,6 +33,7 @@ export class ImageShape extends RectShape {
   error = false;
   smoothingEnabled = this.options.smoothingEnabled;
   smoothingQuality = this.options.smoothingQuality;
+  filter = this.options.filter;
 
   draw(context: CanvasContext): void {
     const { ctx, size } = context;
@@ -54,6 +56,9 @@ export class ImageShape extends RectShape {
           roundedRect(ctx, size, { tl: r, tr: r, br: r, bl: r });
         }
         ctx.clip();
+      }
+      if (this.filter) {
+        ctx.filter = this.filter;
       }
       ctx.drawImage(this.image, 0, 0, size.width, size.height);
       ctx.restore();

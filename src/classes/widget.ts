@@ -1,8 +1,9 @@
-import { CanvasInfo } from "../transformer.js";
+import { CanvasEvent, ClickEvent, HoverEvent } from "../events.js";
+import { Listenable } from "../listenable.js";
 import { drawOutline, Offset, Rect, Size } from "../utils.js";
 
-export abstract class CanvasWidget {
-  abstract draw(context: CanvasContext): void;
+export abstract class CanvasWidget extends Listenable<CanvasEvent> {
+  abstract draw(context: CanvasContext, parent?: Size): void;
 
   selectAt(point: DOMPoint, level: number): CanvasWidget | null {
     const rect = this.rect;
@@ -59,6 +60,22 @@ export abstract class CanvasWidget {
   }
 
   abstract get rect(): Rect;
+
+  onClick(point: DOMPoint) {
+    const event: ClickEvent = {
+      type: "click",
+      offset: { x: point.x, y: point.y },
+    };
+    this.notifyListeners(event);
+  }
+
+  onHover(point: DOMPoint) {
+    const event: HoverEvent = {
+      type: "hover",
+      offset: { x: point.x, y: point.y },
+    };
+    this.notifyListeners(event);
+  }
 }
 
 export interface CanvasContext extends CanvasInfo {

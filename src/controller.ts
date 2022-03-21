@@ -270,6 +270,9 @@ export class CanvasController<
       max: 1,
       level: 0,
     });
+    for (const item of this.hovered) {
+      item.onHover(this.mouse);
+    }
     if (this.mouseDown) {
       this.isMoving = true;
       this.move(
@@ -356,6 +359,9 @@ export class CanvasController<
       max: 1,
       level: this.selectIndex,
     });
+    for (const item of selection) {
+      item.onClick(point);
+    }
     this.updateSelection(selection);
   }
 
