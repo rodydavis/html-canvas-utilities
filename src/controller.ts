@@ -228,7 +228,10 @@ export class CanvasController<
     super.onMouseUp(e);
     if (this.canSelect && !this.isMoving) {
       const point = new DOMPoint(e.clientX, e.clientY);
-      this.doubleClickAt(point);
+      this.doubleClickAt(() => {
+        this.mouse = point;
+        this.selectAt(point);
+      });
     }
     this.isMoving = false;
     this.middleClick = false;
@@ -243,23 +246,22 @@ export class CanvasController<
     return value;
   }
 
-  doubleClickAt(point: DOMPoint) {
+  doubleClickAt(callback: () => void) {
     // Check for dbclick delay
+    const delay = 200; //200;
     if (this.dblClickTimeout !== undefined) {
       clearTimeout(this.dblClickTimeout);
       this.dblClickTimeout = undefined;
       // Double click
+      callback();
       this.selectIndex += 1;
-      this.mouse = point;
-      this.selectAt(point);
     } else {
       this.dblClickTimeout = window.setTimeout(() => {
         this.dblClickTimeout = undefined;
         // Single click
         this.selectIndex = 0;
-        this.mouse = point;
-        this.selectAt(point);
-      }, 200);
+        callback();
+      }, delay);
     }
   }
 
@@ -291,7 +293,10 @@ export class CanvasController<
     if (!this.gestureEvent && this.canSelect) {
       const touch = e.touches[0];
       const point = new DOMPoint(touch.clientX, touch.clientY);
-      this.doubleClickAt(point);
+      this.doubleClickAt(() => {
+        this.mouse = point;
+        this.selectAt(point);
+      });
     }
   }
 

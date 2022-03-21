@@ -23,13 +23,14 @@ export class BoxBase extends RectShape {
   draw(context: CanvasContext): void {
     const { ctx, size } = context;
     let childSize = { ...size };
-    super.draw(context);
+    const newContext = { ...context, size: childSize };
+    super.draw(newContext);
     edgeInset(this.padding, (top, left, bottom, right) => {
       ctx.translate(left, top);
       childSize.width -= left + right;
       childSize.height -= top + bottom;
     });
-    this.child.draw(context);
+    this.child.draw(newContext);
   }
 
   override drawDecoration(
