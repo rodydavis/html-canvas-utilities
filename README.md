@@ -38,6 +38,7 @@ Light Theme
 --canvas-grid-color: #ccc;
 --canvas-selected-color: #f00;
 --canvas-hovered-color: #0f0;
+--canvas-text-color: #000;
 ```
 
 Dark Theme
@@ -47,6 +48,7 @@ Dark Theme
 --canvas-grid-color: #666;
 --canvas-selected-color: #bd0303;
 --canvas-hovered-color: #04a104;
+--canvas-text-color: #fff;
 ```
 
 ## Example
