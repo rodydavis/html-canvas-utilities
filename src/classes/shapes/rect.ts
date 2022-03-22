@@ -1,5 +1,5 @@
-import { color, Size } from "../../utils.js";
-import { CanvasWidget } from "../widget.js";
+import { Size } from "../../utils.js";
+import { CanvasContext } from "../widget.js";
 import { ShapeBase } from "./base.js";
 
 export type RectCornerRadius = number | [number, number, number, number];
@@ -20,14 +20,15 @@ export class RectShape extends ShapeBase {
   rect = this.options.rect;
   cornerRadius?: RectCornerRadius = this.options.cornerRadius;
 
-  draw(ctx: CanvasRenderingContext2D, size: Size): void {
+  draw(context: CanvasContext): void {
+    const { ctx, size } = context;
     ctx.save();
     ctx.lineWidth = this.lineWidth;
     if (this.fillColor) {
-      ctx.fillStyle = color(ctx.canvas, this.fillColor);
+      ctx.fillStyle = context.resolveValue(this.fillColor);
     }
     if (this.strokeColor) {
-      ctx.strokeStyle = color(ctx.canvas, this.strokeColor);
+      ctx.strokeStyle = context.resolveValue(this.strokeColor);
     }
     if (this.cornerRadius) {
       if (Array.isArray(this.cornerRadius)) {

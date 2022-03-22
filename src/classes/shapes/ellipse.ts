@@ -1,5 +1,5 @@
 import { color, Size } from "../../utils.js";
-import { CanvasWidget } from "../widget.js";
+import { CanvasContext, CanvasWidget } from "../widget.js";
 import { ShapeBase } from "./base.js";
 
 export class EllipseShape extends ShapeBase {
@@ -20,7 +20,8 @@ export class EllipseShape extends ShapeBase {
   children?: CanvasWidget[];
   counterclockwise = this.options.counterclockwise || false;
 
-  draw(ctx: CanvasRenderingContext2D, size: Size): void {
+  draw(context: CanvasContext): void {
+    const { ctx, size } = context;
     ctx.save();
     const { width, height } = size;
     const radiusX = width / 2;
@@ -31,10 +32,10 @@ export class EllipseShape extends ShapeBase {
     const counterclockwise = false;
     ctx.lineWidth = this.lineWidth;
     if (this.fillColor) {
-      ctx.fillStyle = color(ctx.canvas, this.fillColor);
+      ctx.fillStyle = context.resolveValue(this.fillColor);
     }
     if (this.strokeColor) {
-      ctx.strokeStyle = color(ctx.canvas, this.strokeColor);
+      ctx.strokeStyle = context.resolveValue(this.strokeColor);
     }
     ctx.translate(radiusX, radiusY);
     ctx.beginPath();

@@ -1,4 +1,5 @@
 import { color, Size } from "../../utils.js";
+import { CanvasContext } from "../widget.js";
 import { LineBase } from "./line.js";
 
 export type ArrowType = "none" | "line-arrow" | "triangle-arrow";
@@ -18,14 +19,15 @@ export class ArrowShape extends LineBase {
   startArrow = this.options.startArrow || "none";
   endArrow = this.options.endArrow || "line-arrow";
 
-  override draw(ctx: CanvasRenderingContext2D, size: Size): void {
+  override draw(context: CanvasContext): void {
+    const { ctx, size } = context;
     ctx.save();
     ctx.lineWidth = this.lineWidth;
     if (this.fillColor) {
-      ctx.fillStyle = color(ctx.canvas, this.fillColor);
+      ctx.fillStyle = context.resolveValue(this.fillColor);
     }
     if (this.strokeColor) {
-      ctx.strokeStyle = color(ctx.canvas, this.strokeColor);
+      ctx.strokeStyle = context.resolveValue(this.strokeColor);
     }
     const { width } = size;
     const start = new DOMPoint(0, 0);

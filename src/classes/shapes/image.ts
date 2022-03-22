@@ -1,5 +1,5 @@
 import { color, Size } from "../../utils.js";
-import { CanvasWidget } from "../widget.js";
+import { CanvasContext, CanvasWidget } from "../widget.js";
 import { RectCornerRadius, RectShape, roundedRect } from "./rect.js";
 
 export class ImageShape extends RectShape {
@@ -35,10 +35,11 @@ export class ImageShape extends RectShape {
   smoothingQuality = this.options.smoothingQuality;
   filter = this.options.filter;
 
-  draw(ctx: CanvasRenderingContext2D, size: Size): void {
-    super.draw(ctx, size);
+  draw(context: CanvasContext): void {
+    const { ctx, size } = context;
+    super.draw(context);
     if (this.error) {
-      drawPlaceholder(ctx, "red", size);
+      drawPlaceholder(context, "red");
     } else if (this.loaded) {
       ctx.save();
       if (this.options.smoothingEnabled && this.options.smoothingQuality) {
@@ -62,19 +63,16 @@ export class ImageShape extends RectShape {
       ctx.drawImage(this.image, 0, 0, size.width, size.height);
       ctx.restore();
     } else {
-      drawPlaceholder(ctx, "--canvas-grid-color", size);
+      drawPlaceholder(context, "--canvas-grid-color");
     }
   }
 }
 
-function drawPlaceholder(
-  ctx: CanvasRenderingContext2D,
-  outlineColor: string,
-  size: Size
-): void {
+function drawPlaceholder(context: CanvasContext, outlineColor: string): void {
+  const { ctx, size } = context;
   ctx.save();
-  ctx.fillStyle = color(ctx.canvas, outlineColor);
-  ctx.strokeStyle = color(ctx.canvas, outlineColor);
+  ctx.fillStyle = context.resolveValue(outlineColor);
+  ctx.strokeStyle = context.resolveValue(outlineColor);
   ctx.strokeRect(0, 0, size.width, size.height);
   ctx.beginPath();
   ctx.moveTo(0, 0);

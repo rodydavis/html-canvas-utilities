@@ -1,9 +1,10 @@
-import { CanvasEvent, ClickEvent, HoverEvent } from "../events.js";
+import { CanvasEvent, ClickEvent, FrameUpdate, HoverEvent } from "../events.js";
 import { Listenable } from "../listenable.js";
+import { CanvasInfo } from "../transformer.js";
 import { drawOutline, Offset, Rect, Size } from "../utils.js";
 
 export abstract class CanvasWidget extends Listenable<CanvasEvent> {
-  abstract draw(ctx: CanvasRenderingContext2D, size: Size, parent?: Size): void;
+  abstract draw(context: CanvasContext, parent?: Size): void;
 
   selectAt(point: DOMPoint, level: number): CanvasWidget | null {
     const rect = this.rect;
@@ -18,17 +19,22 @@ export abstract class CanvasWidget extends Listenable<CanvasEvent> {
     return null;
   }
 
+  hidden = false;
+
   drawDecoration(
-    ctx: CanvasRenderingContext2D,
+    context: CanvasContext,
     selection: CanvasWidget[],
-    hovered: CanvasWidget[],
-    size?: Size
+    hovered: CanvasWidget[]
   ) {
-    const rect = size ?? this.rect;
+    const rect = this.rect;
+    const ctx = {
+      ...context,
+      size: rect,
+    };
     if (selection.length > 0 && selection.includes(this)) {
-      drawOutline(ctx, rect, "--canvas-selected-color");
+      drawOutline(ctx, "--canvas-selected-color");
     } else if (hovered.length > 0 && hovered.includes(this)) {
-      drawOutline(ctx, rect, "--canvas-hovered-color");
+      drawOutline(ctx, "--canvas-hovered-color");
     }
   }
 
@@ -73,4 +79,18 @@ export abstract class CanvasWidget extends Listenable<CanvasEvent> {
     };
     this.notifyListeners(event);
   }
+
+  onUpdate(time: number) {
+    const event: FrameUpdate = {
+      type: "update",
+      time,
+    };
+    this.notifyListeners(event);
+  }
+}
+
+export interface CanvasContext extends CanvasInfo {
+  ctx: CanvasRenderingContext2D;
+  size: Size;
+  resolveValue: (value: string) => string;
 }

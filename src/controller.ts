@@ -1,6 +1,7 @@
-import { CanvasWidget } from "./classes";
+import { CanvasContext, CanvasWidget, TextShape } from "./classes";
 import { drawInfiniteGrid } from "./infinite-grid";
 import {
+  CanvasInfo,
   CanvasTransformer,
   CanvasTransformerOptions,
   defaultOptions,
@@ -46,10 +47,12 @@ export class CanvasController<
   canSelect = true;
   canMove = true;
   canDelete = true;
+  canEditText = true;
   drawGrid = true;
   selectIndex = 0;
   isMoving = false;
   dblClickTimeout?: number;
+  editingText = false;
 
   drawBackground() {
     const { offset, scale } = this.info;
@@ -62,13 +65,11 @@ export class CanvasController<
       return;
     }
     ctx.save();
-    ctx.fillStyle = color(canvas, "--canvas-background-color");
+    ctx.fillStyle = this.resolveValue(canvas, "--canvas-background-color");
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (this.drawGrid) {
-      drawInfiniteGrid(canvas, ctx, {
-        offset,
-        scale,
+      drawInfiniteGrid(this.getContext(ctx), {
         backgroundColor: "--canvas-background-color",
         gridColor: "--canvas-grid-color",
       });
@@ -96,7 +97,7 @@ export class CanvasController<
     ctx.scale(dpr, dpr);
   }
 
-  paint() {
+  paint(time: number = 0) {
     const { canvas, ctx } = this;
     this.resize();
 
@@ -114,7 +115,7 @@ export class CanvasController<
     this.applyTransform(ctx);
 
     // Draw content
-    this.drawContent(ctx);
+    this.drawContent(ctx, time);
 
     // Apply Transform
     this.applyTransform(ctx);
@@ -124,30 +125,50 @@ export class CanvasController<
       const rect = outerRect(this.selection.map((item) => item.rect));
       ctx.save();
       ctx.translate(rect.x, rect.y);
-      this.drawOutline(ctx, rect, "--canvas-selected-color");
+      this.drawOutline(this.getContext(ctx), "--canvas-selected-color");
       ctx.restore();
     }
 
-    requestAnimationFrame(() => this.paint());
+    requestAnimationFrame((time) => this.paint(time));
   }
 
-  drawContent(ctx: CanvasRenderingContext2D) {
+  drawContent(ctx: CanvasRenderingContext2D, time: number) {
     for (const child of this.children) {
-      this.drawChild(ctx, child);
+      this.drawChild(ctx, child, time);
     }
   }
 
-  drawChild(ctx: CanvasRenderingContext2D, child: T, parent?: DOMRect) {
+  drawChild(ctx: CanvasRenderingContext2D, child: T, time: number) {
     const offset = child.offset;
     ctx.save();
     ctx.translate(offset.x, offset.y);
-    child.draw(this.ctx, child.size);
-    child.drawDecoration(ctx, this.selection, this.hovered);
+    const context = this.getContext(ctx);
+    child.onUpdate(time);
+    if (!child.hidden) {
+      child.draw({
+        ...context,
+        size: child.size,
+      });
+    }
+    child.drawDecoration(context, this.selection, this.hovered);
     ctx.translate(-offset.x, -offset.y);
     ctx.restore();
   }
 
-  drawOutline(ctx: CanvasRenderingContext2D, size: Size, strokeColor: string) {
+  getContext(ctx: CanvasRenderingContext2D) {
+    return {
+      ctx,
+      size: {
+        width: this.canvas.width,
+        height: this.canvas.height,
+      },
+      resolveValue: (key: string) => this.resolveValue(ctx.canvas, key),
+      ...this.info,
+    };
+  }
+
+  drawOutline(context: CanvasContext, strokeColor: string) {
+    const { ctx, size } = context;
     const { canvas } = this;
     if (this.options.drawOutline !== undefined) {
       ctx.save();
@@ -156,7 +177,7 @@ export class CanvasController<
       return;
     }
     ctx.save();
-    ctx.strokeStyle = color(canvas, strokeColor);
+    ctx.strokeStyle = this.resolveValue(canvas, strokeColor);
     ctx.strokeRect(0, 0, size.width, size.height);
     ctx.restore();
   }
@@ -210,33 +231,26 @@ export class CanvasController<
 
   override onMouseUp(e: MouseEvent): void {
     super.onMouseUp(e);
-    if (this.canSelect && !this.isMoving) {
-      const point = new DOMPoint(e.clientX, e.clientY);
-      this.doubleClickAt(point);
-    }
     this.isMoving = false;
     this.middleClick = false;
     this.updateCursor();
   }
 
-  doubleClickAt(point: DOMPoint) {
-    // Check for dbclick delay
-    if (this.dblClickTimeout !== undefined) {
-      clearTimeout(this.dblClickTimeout);
-      this.dblClickTimeout = undefined;
-      // Double click
-      this.selectIndex += 1;
-      this.mouse = point;
-      this.selectAt(point);
-    } else {
-      this.dblClickTimeout = window.setTimeout(() => {
-        this.dblClickTimeout = undefined;
-        // Single click
-        this.selectIndex = 0;
-        this.mouse = point;
-        this.selectAt(point);
-      }, 200);
+  resolveValue(elem: HTMLElement, value: string): string {
+    if (value.startsWith("--")) {
+      const s = getComputedStyle(elem ?? document.body);
+      const parts = value.split(",");
+      for (const part of parts) {
+        if (part !== "" && !part.startsWith("--")) {
+          return part;
+        }
+        const v = s.getPropertyValue(part);
+        if (v !== "") {
+          return v;
+        }
+      }
     }
+    return value;
   }
 
   override onMouseMove(e: MouseEvent): void {
@@ -263,12 +277,6 @@ export class CanvasController<
 
   override onTouchStart(e: TouchEvent): void {
     super.onTouchStart(e);
-
-    if (!this.gestureEvent && this.canSelect) {
-      const touch = e.touches[0];
-      const point = new DOMPoint(touch.clientX, touch.clientY);
-      this.doubleClickAt(point);
-    }
   }
 
   override onTouchMove(e: TouchEvent): void {
@@ -301,6 +309,8 @@ export class CanvasController<
   }
 
   override onKeyDownEvent(e: KeyboardEvent) {
+    const isActive = this.canvas === document.activeElement;
+    if (!isActive) return;
     super.onKeyDownEvent(e);
     if (e.key === "Backspace") {
       this.removeSelection();
@@ -336,9 +346,94 @@ export class CanvasController<
       level: this.selectIndex,
     });
     for (const item of selection) {
+      if (
+        item instanceof TextShape &&
+        this.selectIndex > 0 &&
+        this.canEditText
+      ) {
+        this.onEditText(point, item);
+        continue;
+      }
       item.onClick(point);
     }
     this.updateSelection(selection);
+  }
+
+  onEditText(point: DOMPoint, item: TextShape) {
+    // Create input at text node location
+    this.editingText = true;
+    item.hidden = true;
+    const prev = item.characters;
+    const input = document.createElement("input");
+    const worldPoint = this.worldPoint(new DOMPoint(item.rect.x, item.rect.y));
+    const inputStyle = input.style;
+    inputStyle.position = "fixed";
+    inputStyle.left = `${worldPoint.x}px`;
+    inputStyle.top = `${worldPoint.y}px`;
+    const scale = this.info.scale;
+    const size = item.fontSize * scale;
+    const width = item.rect.width * scale;
+    const height = item.rect.height * scale;
+    inputStyle.width = `${width}px`;
+    inputStyle.height = `${height}px`;
+    inputStyle.fontSize = `${size}px`;
+    inputStyle.fontFamily = item.fontFamily;
+    inputStyle.zIndex = "1";
+    inputStyle.border = "none";
+    inputStyle.outline = "none";
+    inputStyle.padding = "0";
+    inputStyle.margin = "0";
+    inputStyle.textAlign = item.textAlign;
+    inputStyle.direction = item.direction;
+    inputStyle.verticalAlign = item.textBaseline;
+    inputStyle.backgroundColor = "var(--canvas-background-color)";
+    const inputColor = item.fillColor ?? item.strokeColor;
+    inputStyle.color = this.resolveValue(this.canvas, inputColor);
+    document.body.appendChild(input);
+    input.focus();
+    input.value = item.characters;
+    input.addEventListener("input", (e) => {
+      const target = e.target as HTMLInputElement;
+      item.characters = target.value;
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      ctx.font = `${size}px ${item.fontFamily}`;
+      const width = ctx.measureText(target.value).width;
+      item.rect.width = width * scale;
+      inputStyle.width = `${width}px`;
+    });
+    let removed = false;
+    const remove = (e: Event) => {
+      e.preventDefault();
+      if (removed) return;
+      const target = e.target as HTMLInputElement;
+      const isEmpty = target.value.trim().length === 0;
+      if (this.canDelete) {
+        if (isEmpty && item.removeOnEmpty) {
+          this.selection = [item] as any[];
+          this.removeSelection();
+        } else {
+          item.characters = target.value;
+        }
+      } else {
+        item.characters = isEmpty ? prev : target.value;
+      }
+      item.notifyListeners();
+      try {
+        input.remove();
+      } catch (error) {}
+      this.editingText = false;
+      removed = true;
+      item.hidden = false;
+      return false;
+    };
+    input.addEventListener("blur", remove.bind(this), false);
+    input.addEventListener("change", remove.bind(this), false);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === "Escape") {
+        remove(e);
+      }
+    });
   }
 
   updateSelection(selection: T[]) {
@@ -368,5 +463,32 @@ export class CanvasController<
   addChild(widget: T) {
     this.children.push(widget);
     this.updateSelection([widget]);
+  }
+
+  onClick(e: MouseEvent): void {
+    super.onClick(e);
+    if (this.canSelect && !this.isMoving) {
+      const point = new DOMPoint(e.clientX, e.clientY);
+      this.selectIndex = 0;
+      this.selectAt(point);
+    }
+  }
+
+  onDoubleClick(e: MouseEvent): void {
+    super.onDoubleClick(e);
+    if (this.canSelect && !this.isMoving) {
+      const point = new DOMPoint(e.clientX, e.clientY);
+      this.selectIndex += 1;
+      this.selectAt(point);
+    }
+  }
+
+  init() {
+    window.addEventListener("resize", () => this.resize());
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+    this.clearSelection();
+    this.canvasResize();
+    this.paint();
   }
 }

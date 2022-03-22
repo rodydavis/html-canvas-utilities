@@ -7,4 +7,5 @@ export * from './line'
 export * from './polygon'
 export * from './rect'
 export * from './star'
+export * from './text'
 // @endindex
