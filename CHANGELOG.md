@@ -17,7 +17,6 @@ draw(context: CanvasContext): void {
     const { ctx, size } = context;
 ```
 
-
 ## 0.1.1
 
 - Adding tests
