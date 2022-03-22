@@ -1,26 +1,31 @@
 import { html, css, LitElement } from "lit";
 import { customElement, query } from "lit/decorators.js";
 import { CanvasController } from "html-canvas-utilities";
-import { addRandomShapes } from "./shapes.js";
+import { addRandomShapes } from "./demo/shapes.js";
+import { generateText } from "./demo/segmented-display.js";
+import { colorDemo } from "./demo/color.js";
+import { addText } from "./demo/text.js";
 
 @customElement("canvas-editor")
 export class CanvasEditor extends LitElement {
   static styles = css`
-    canvas {
+    * {
       --canvas-background-color: #fafafa;
       --canvas-grid-color: #ccc;
       --canvas-selected-color: #f00;
       --canvas-hovered-color: #0f0;
+      --canvas-text-color: #000;
       cursor: pointer;
       user-select: none;
       user-zoom: none;
     }
     @media (prefers-color-scheme: dark) {
-      canvas {
+      * {
         --canvas-background-color: #333;
         --canvas-grid-color: #666;
         --canvas-selected-color: #bd0303;
         --canvas-hovered-color: #04a104;
+        --canvas-text-color: #fff;
       }
     }
   `;
@@ -38,17 +43,13 @@ export class CanvasEditor extends LitElement {
       const { offset, scale } = controller.info;
       console.debug(`offset: ${offset.x}, ${offset.y}; scale: ${scale}`);
     });
-    window.addEventListener("resize", () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    controller.init();
+
+    // Add Demos
+    generateText(controller);
+    colorDemo(controller);
     addRandomShapes(controller);
-    controller.clearSelection();
-    controller.canvasResize();
-    window.addEventListener("canvasResize", () => controller.resize());
-    controller.paint();
+    addText(controller);
   }
 }
 

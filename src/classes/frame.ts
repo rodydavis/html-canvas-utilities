@@ -20,17 +20,16 @@ export class Frame extends BoxBase {
 
   drawLabel(context: CanvasContext) {
     const { ctx, scale } = context;
-    const offset = { x: 0, y: -(1 * scale) };
-    ctx.translate(offset.x, offset.y);
     ctx.scale(1 / scale, 1 / scale);
     const lineHeight = 1.2;
     const fontSize = 10 * lineHeight;
     ctx.font = `${fontSize}px sans-serif`;
-    ctx.fillStyle = "black";
+    ctx.fillStyle = context.resolveValue("--canvas-text-color");
     const ellipse = "...";
     let textWidth = ctx.measureText(this.label).width;
     const textHeight = fontSize;
     const boxWidth = this.rect.width * scale;
+    ctx.translate(0, -6);
     if (textWidth > boxWidth) {
       const ellipsisWidth = ctx.measureText(ellipse).width;
       textWidth = boxWidth - ellipsisWidth;
@@ -46,7 +45,7 @@ export class Frame extends BoxBase {
     } else {
       ctx.fillText(this.label, 0, 0);
     }
-    ctx.translate(-offset.x, -offset.y);
+    ctx.translate(0, 6);
     ctx.scale(scale, scale);
   }
 }

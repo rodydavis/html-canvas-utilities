@@ -26,42 +26,44 @@ export class CanvasTransformer<T> extends Listenable<T> {
     this.shouldNotify = true;
 
     // Scroll events
-    this.onWheelEvent = this.onWheelEvent.bind(this);
-    canvas.addEventListener("wheel", this.onWheelEvent, { passive: false });
+    canvas.addEventListener("wheel", this.onWheelEvent.bind(this), {
+      passive: false,
+    });
 
     // Mouse Events
-    this.onMouseDown = this.onMouseDown.bind(this);
-    canvas.addEventListener("mousedown", this.onMouseDown, false);
-    this.onMouseMove = this.onMouseMove.bind(this);
-    canvas.addEventListener("mousemove", this.onMouseMove, false);
-    this.onMouseUp = this.onMouseUp.bind(this);
-    canvas.addEventListener("mouseup", this.onMouseUp, false);
+    canvas.addEventListener("mousedown", this.onMouseDown.bind(this), false);
+    canvas.addEventListener("mousemove", this.onMouseMove.bind(this), false);
+    canvas.addEventListener("mouseup", this.onMouseUp.bind(this), false);
 
     // Touch Events
-    this.onTouchStart = this.onTouchStart.bind(this);
-    canvas.addEventListener("touchstart", this.onTouchStart, false);
-    this.onTouchMove = this.onTouchMove.bind(this);
-    canvas.addEventListener("touchmove", this.onTouchMove, false);
-    this.onTouchEnd = this.onTouchEnd.bind(this);
-    canvas.addEventListener("touchend", this.onTouchEnd, false);
+    canvas.addEventListener("touchstart", this.onTouchStart.bind(this), false);
+    canvas.addEventListener("touchmove", this.onTouchMove.bind(this), false);
+    canvas.addEventListener("touchend", this.onTouchEnd.bind(this), false);
 
-    // Double click and Click
-    this.onDoubleClick = this.onDoubleClick.bind(this);
-    canvas.addEventListener("dblclick", this.onDoubleClick, false);
-    this.onClick = this.onClick.bind(this);
-    canvas.addEventListener("click", this.onClick, false);
+    // Double click and click
+    canvas.addEventListener("dblclick", this.onDoubleClick.bind(this), false);
+    canvas.addEventListener("click", this.onClick.bind(this), false);
 
     // TODO: Prevent Safari iPadOS pinch / zoom
-    // canvas.addEventListener("gesturestart", this.preventDefault, false);
-    // canvas.addEventListener("gesturechange", this.preventDefault, false);
-    // canvas.addEventListener("gestureend", this.preventDefault, false);
-    // window.addEventListener("scroll", this.preventDefault, { passive: false });
+    canvas.addEventListener(
+      "gesturestart",
+      this.onGestureStart.bind(this),
+      false
+    );
+    canvas.addEventListener(
+      "gesturechange",
+      this.onGestureChange.bind(this),
+      false
+    );
+    canvas.addEventListener("gestureend", this.onGestureEnd.bind(this), false);
 
     // Keyboard Events
-    this.onKeyDownEvent = this.onKeyDownEvent.bind(this);
-    this.onKeyUpEvent = this.onKeyUpEvent.bind(this);
-    document.addEventListener("keydown", this.onKeyDownEvent, false);
-    document.addEventListener("keyup", this.onKeyUpEvent, false);
+    document.addEventListener("keydown", this.onKeyDownEvent.bind(this), false);
+    document.addEventListener("keyup", this.onKeyUpEvent.bind(this), false);
+
+    // Drag and drop events
+    canvas.addEventListener("dragover", this.onDrop.bind(this), false);
+    canvas.addEventListener("drop", this.onDrop.bind(this), false);
   }
 
   gestureEvent = false;
@@ -73,6 +75,7 @@ export class CanvasTransformer<T> extends Listenable<T> {
   shiftPressed = false;
   metaPressed = false;
   middleClick = false;
+  _previousGesture: MouseEvent & GestureEvent;
 
   private transform: DOMMatrix;
   get matrix() {
@@ -107,6 +110,13 @@ export class CanvasTransformer<T> extends Listenable<T> {
     // return point.matrixTransform(this.matrix.inverse());
   }
 
+  worldPoint(point: DOMPoint) {
+    const { scale, offset } = this.info;
+    const x = point.x * scale + offset.x;
+    const y = point.y * scale + offset.y;
+    return new DOMPoint(x, y);
+  }
+
   /**
    * Apply a new transform to the canvas
    *
@@ -133,6 +143,26 @@ export class CanvasTransformer<T> extends Listenable<T> {
     const center = origin || this.mouse;
     const point = this.localPoint(center);
     this.matrix = this.matrix.scale(scale, scale, 0, point.x, point.y, point.z);
+    this.notify();
+  }
+
+  /**
+   * Scale the canvas by a factor and origin in the viewport
+   *
+   * @param delta Scale delta
+   * @param origin Origin to scale at
+   */
+  zoom(amount: number, origin?: DOMPoint) {
+    if (Number.isNaN(amount)) return;
+    const delta = this.info.scale - amount;
+    this.options.scale = amount;
+    // Make sure the scale is within bounds
+    if (amount < this.minScale || amount > this.maxScale) {
+      return;
+    }
+    const center = origin || this.mouse;
+    const point = this.localPoint(center);
+    this.matrix = this.matrix.scale(delta, delta, 0, point.x, point.y, point.z);
     this.notify();
   }
 
@@ -300,6 +330,8 @@ export class CanvasTransformer<T> extends Listenable<T> {
   }
 
   onKeyDownEvent(e: KeyboardEvent) {
+    const isActive = this.canvas === document.activeElement;
+    if (!isActive) return;
     this.preventDefault(e);
     if (e.key === "ArrowLeft") {
       this.pan(new DOMPoint(-10, 0));
@@ -336,8 +368,43 @@ export class CanvasTransformer<T> extends Listenable<T> {
     this.preventDefault(e);
   }
 
+  onDragOver(e: DragEvent) {
+    this.preventDefault(e);
+  }
+
+  onDrop(e: DragEvent) {
+    this.preventDefault(e);
+  }
+
+  onGestureStart(e: MouseEvent & GestureEvent) {
+    this.preventDefault(e);
+    this._previousGesture = e;
+    this.gestureEvent = true;
+    return false;
+  }
+
+  onGestureChange(e: MouseEvent & GestureEvent) {
+    this.preventDefault(e);
+    const point = new DOMPoint(e.clientX, e.clientY);
+    const prevScale = this._previousGesture.scale;
+    const scale = e.scale;
+    const scaleDelta = scale / prevScale;
+    this.scale(scaleDelta, point);
+    this._previousGesture = e;
+    return false;
+  }
+
+  onGestureEnd(e: MouseEvent & GestureEvent) {
+    this.preventDefault(e);
+    this._previousGesture = e;
+    this.gestureEvent = false;
+    return false;
+  }
+
   preventDefault(e: Event) {
     e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
   }
 }
 
@@ -375,4 +442,9 @@ export interface CanvasInfo {
   rotation: number;
   mouse: DOMPoint;
   mouseDown: boolean;
+}
+
+interface GestureEvent {
+  scale: number;
+  rotation: number;
 }

@@ -1,3 +1,23 @@
+## 0.2.0
+
+- Adding update callback for animation
+- Adding frame element (w/ scale independent label)
+- Fixing click and double click events
+- Updating examples
+- Adding init method
+- Fix for active element
+- Adding edit text
+- Adding canvas context:
+
+```js
+// Old
+draw(ctx: CanvasRenderingContext2D, size: Size): void {
+// New
+draw(context: CanvasContext): void {
+    const { ctx, size } = context;
+```
+
+
 ## 0.1.1
 
 - Adding tests

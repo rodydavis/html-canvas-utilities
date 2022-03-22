@@ -130,27 +130,11 @@ export function addRandomShapes(controller: CanvasController) {
         cornerRadius: 5,
       }),
     })
-    //   child: new RowBase({
-    //     children: [
-    //       new RectShape({
-    //         rect: new DOMRect(0, 0, 30, 30),
-    //         fillColor: "yellow",
-    //       }),
-    //       new RectShape({
-    //         rect: new DOMRect(0, 0, 30, 30),
-    //         fillColor: "green",
-    //       }),
-    //       new RectShape({
-    //         rect: new DOMRect(0, 0, 30, 30),
-    //         fillColor: "purple",
-    //       }),
-    //     ],
-    //   }),
   );
   controller.addChild(
     new Frame({
       label: "Frame",
-      rect: new DOMRect(0, 0, 100, 100),
+      rect: new DOMRect(600, 600, 100, 100),
       fillColor: "gray",
       padding: 10,
       child: new RectShape({

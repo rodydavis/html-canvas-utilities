@@ -1,4 +1,4 @@
-import { CanvasEvent, ClickEvent, HoverEvent } from "../events.js";
+import { CanvasEvent, ClickEvent, FrameUpdate, HoverEvent } from "../events.js";
 import { Listenable } from "../listenable.js";
 import { CanvasInfo } from "../transformer.js";
 import { drawOutline, Offset, Rect, Size } from "../utils.js";
@@ -18,6 +18,8 @@ export abstract class CanvasWidget extends Listenable<CanvasEvent> {
     }
     return null;
   }
+
+  hidden = false;
 
   drawDecoration(
     context: CanvasContext,
@@ -74,6 +76,14 @@ export abstract class CanvasWidget extends Listenable<CanvasEvent> {
     const event: HoverEvent = {
       type: "hover",
       offset: { x: point.x, y: point.y },
+    };
+    this.notifyListeners(event);
+  }
+
+  onUpdate(time: number) {
+    const event: FrameUpdate = {
+      type: "update",
+      time,
     };
     this.notifyListeners(event);
   }

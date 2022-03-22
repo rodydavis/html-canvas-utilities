@@ -1,4 +1,4 @@
-import { color, Size } from "../../utils.js";
+import { Size } from "../../utils.js";
 import { CanvasContext } from "../widget.js";
 import { ShapeBase } from "./base.js";
 

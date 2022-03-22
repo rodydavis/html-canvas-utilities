@@ -1,7 +1,7 @@
 import { Offset } from "./utils.js";
 
 export interface CanvasEvent {
-  type: "click" | "hover";
+  type: "click" | "hover" | "update";
 }
 
 export interface ClickEvent extends CanvasEvent {
@@ -12,4 +12,9 @@ export interface ClickEvent extends CanvasEvent {
 export interface HoverEvent extends CanvasEvent {
   type: "hover";
   offset: Offset;
+}
+
+export interface FrameUpdate extends CanvasEvent {
+  type: "update";
+  time: number;
 }
