@@ -105,7 +105,7 @@ controller.addChild({
 });
 
 // Start the animation loop
-controller.paint();
+controller.init();
 ```
 
 ### Lit Example
@@ -148,14 +148,7 @@ export class CanvasEditor extends LitElement {
     controller.addListener(() => {
       const { offset, scale } = controller.info;
       console.debug(`offset: ${offset.x}, ${offset.y}; scale: ${scale}`);
-    });
-    const resize = () => {
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
-    };
-    window.addEventListener("resize", () => resize());
-    resize();
-    
+    });  
     controller.addChild({
         rect: new DOMRect(0, 0, 100, 100),
         draw: (ctx: CanvasRenderingContext2D) => {
@@ -165,9 +158,7 @@ export class CanvasEditor extends LitElement {
             ctx.restore();
         },
     });
-
-    controller.clearSelection();
-    controller.paint();
+    controller.init();
   }
 }
 
