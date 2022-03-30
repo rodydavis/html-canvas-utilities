@@ -1,20 +1,16 @@
-import { color, Size } from "../../utils.js";
-import { CanvasContext, CanvasWidget } from "../widget.js";
-import { RectCornerRadius, RectShape, roundedRect } from "./rect.js";
+import { CanvasContext } from "../widget.js";
+import { VectorOptions } from "./base.js";
+import { RectShape, roundedRect } from "./rect.js";
+
+export interface ImageOptions extends VectorOptions {
+  image: string;
+  filter?: string;
+  smoothingEnabled?: boolean;
+  smoothingQuality?: ImageSmoothingQuality;
+}
 
 export class ImageShape extends RectShape {
-  constructor(
-    readonly options: {
-      rect: DOMRect;
-      fillColor?: string;
-      strokeColor?: string;
-      cornerRadius?: RectCornerRadius;
-      image: string;
-      filter?: string;
-      smoothingEnabled?: boolean;
-      smoothingQuality?: ImageSmoothingQuality;
-    }
-  ) {
+  constructor(options: ImageOptions) {
     super(options);
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -27,13 +23,16 @@ export class ImageShape extends RectShape {
       this.error = true;
       this.loaded = true;
     };
+    this.smoothingEnabled = options.smoothingEnabled;
+    this.smoothingQuality = options.smoothingQuality;
+    this.filter = options.filter;
   }
   image: HTMLImageElement;
   loaded = false;
   error = false;
-  smoothingEnabled = this.options.smoothingEnabled;
-  smoothingQuality = this.options.smoothingQuality;
-  filter = this.options.filter;
+  smoothingEnabled?: boolean;
+  smoothingQuality?: ImageSmoothingQuality;
+  filter?: string;
 
   draw(context: CanvasContext): void {
     const { ctx, size } = context;
@@ -42,9 +41,9 @@ export class ImageShape extends RectShape {
       drawPlaceholder(context, "red");
     } else if (this.loaded) {
       ctx.save();
-      if (this.options.smoothingEnabled && this.options.smoothingQuality) {
+      if (this.smoothingEnabled && this.smoothingQuality) {
         ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = this.options.smoothingQuality;
+        ctx.imageSmoothingQuality = this.smoothingQuality;
       }
       if (this.cornerRadius) {
         if (Array.isArray(this.cornerRadius)) {

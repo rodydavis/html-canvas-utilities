@@ -1,24 +1,24 @@
-import { color, Size } from "../../utils.js";
-import { CanvasContext, CanvasWidget } from "../widget.js";
-import { ShapeBase } from "./base.js";
+import { CanvasContext } from "../widget.js";
+import { VectorBase, VectorOptions } from "./base.js";
 
-export class EllipseShape extends ShapeBase {
-  constructor(
-    readonly options: {
-      rect: DOMRect;
-      fillColor?: string;
-      strokeColor?: string;
-      counterclockwise?: boolean;
-    }
-  ) {
-    super();
+export interface EllipseOptions extends VectorOptions {
+  counterclockwise?: boolean;
+}
+
+export class EllipseShape extends VectorBase {
+  constructor(options: EllipseOptions) {
+    super(options);
+    this.counterclockwise = options.counterclockwise ?? false;
   }
 
-  fillColor? = this.options.fillColor;
-  strokeColor? = this.options.strokeColor;
-  rect = this.options.rect;
-  children?: CanvasWidget[];
-  counterclockwise = this.options.counterclockwise || false;
+  private _counterclockwise: boolean;
+  get counterclockwise(): boolean {
+    return this._counterclockwise;
+  }
+  set counterclockwise(value: boolean) {
+    this._counterclockwise = value;
+    this.notifyListeners();
+  }
 
   draw(context: CanvasContext): void {
     const { ctx, size } = context;

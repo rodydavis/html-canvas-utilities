@@ -1,4 +1,3 @@
-import { Size } from "../utils";
 import { BoxBase, BoxOptions } from "./box";
 import { CanvasContext } from "./widget";
 

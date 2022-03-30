@@ -1,23 +1,24 @@
-import { color, Size } from "../../utils.js";
-import { CanvasContext, CanvasWidget } from "../widget.js";
-import { ShapeBase } from "./base.js";
+import { CanvasContext } from "../widget.js";
+import { VectorBase, VectorOptions } from "./base.js";
 
-export class PolygonShape extends ShapeBase {
-  constructor(
-    readonly options: {
-      rect: DOMRect;
-      fillColor?: string;
-      strokeColor?: string;
-      pointCount?: number;
-    }
-  ) {
-    super();
+export interface PolygonOptions extends VectorOptions {
+  pointCount?: number;
+}
+
+export class PolygonShape extends VectorBase {
+  constructor(options: PolygonOptions) {
+    super(options);
+    this.pointCount = options.pointCount || 5;
   }
-  fillColor? = this.options.fillColor;
-  strokeColor? = this.options.strokeColor;
-  rect = this.options.rect;
-  pointCount = this.options.pointCount || 5;
-  children?: CanvasWidget[];
+
+  private _pointCount: number;
+  get pointCount(): number {
+    return this._pointCount;
+  }
+  set pointCount(value: number) {
+    this._pointCount = value;
+    this.notifyListeners();
+  }
 
   draw(context: CanvasContext): void {
     const { ctx, size } = context;

@@ -1,24 +1,23 @@
-import { drawOutline, Size } from "../utils.js";
-import { RectShape } from "./shapes/index.js";
+import { drawOutline } from "../utils.js";
+import { RectShape, VectorOptions } from "./shapes/index.js";
 import { CanvasContext, CanvasWidget } from "./widget.js";
 
 export type EdgeInsets = number | [number, number, number, number];
 
-export interface BoxOptions {
-  rect: DOMRect;
-  fillColor?: string;
-  strokeColor?: string;
+export interface BoxOptions extends VectorOptions {
   padding?: EdgeInsets;
   child: CanvasWidget;
 }
 
 export class BoxBase extends RectShape {
-  constructor(readonly options: BoxOptions) {
+  constructor(options: BoxOptions) {
     super(options);
+    this.padding = options.padding;
+    this.child = options.child;
   }
 
-  child = this.options.child;
-  padding = this.options.padding;
+  child: CanvasWidget;
+  padding?: EdgeInsets;
 
   draw(context: CanvasContext): void {
     const { ctx, size } = context;

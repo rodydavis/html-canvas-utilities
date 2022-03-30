@@ -1,6 +1,6 @@
 {
   "name": "html-canvas-utilities",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Canvas utilities for the browser (Pan, zoom, move, select).",
   "main": "dist/index.js",
   "module": "dist/index.js",

@@ -1,21 +1,13 @@
-import { color, Size } from "../../utils.js";
-import { CanvasContext, CanvasWidget } from "../widget.js";
-import { ShapeBase } from "./base.js";
+import { CanvasContext } from "../widget.js";
+import { VectorBase, VectorOptions } from "./base.js";
 
-export class LineBase extends ShapeBase {
-  constructor(
-    readonly options: {
-      rect: DOMRect;
-      fillColor?: string;
-      strokeColor?: string;
-    }
-  ) {
-    super();
+export interface LineOptions extends VectorOptions {}
+
+export class LineBase extends VectorBase {
+  constructor(options: LineOptions) {
+    super(options);
+    this.rect = options.rect;
   }
-  fillColor? = this.options.fillColor;
-  strokeColor? = this.options.strokeColor;
-  rect = this.options.rect;
-  children?: CanvasWidget[];
 
   draw(context: CanvasContext): void {
     const { ctx, size } = context;

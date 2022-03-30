@@ -1,3 +1,8 @@
+## 0.2.1
+
+- Adding getter and setter for all classes
+- Adding option types for all classes
+
 ## 0.2.0
 
 - Adding update callback for animation

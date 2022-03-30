@@ -1,21 +1,19 @@
-import { Offset, Size } from "../../utils.js";
+import { Offset } from "../../utils.js";
 import { CanvasContext } from "../widget.js";
-import { ShapeBase } from "./base.js";
+import { ShapeBase, ShapeOptions } from "./base.js";
+
+export interface TextOptions extends ShapeOptions {
+  characters: string;
+  offset: Offset;
+  fontSize?: number;
+  fontFamily?: string;
+  direction?: CanvasDirection;
+  textAlign?: CanvasTextAlign;
+  textBaseline?: CanvasTextBaseline;
+}
 
 export class TextShape extends ShapeBase {
-  constructor(
-    readonly options: {
-      characters: string;
-      offset: Offset;
-      fillColor?: string;
-      strokeColor?: string;
-      fontSize?: number;
-      fontFamily?: string;
-      direction?: CanvasDirection;
-      textAlign?: CanvasTextAlign;
-      textBaseline?: CanvasTextBaseline;
-    }
-  ) {
+  constructor(options: TextOptions) {
     super();
     this.characters = options.characters;
     this.fillColor = options.fillColor;
@@ -29,16 +27,78 @@ export class TextShape extends ShapeBase {
     this.textBaseline = options.textBaseline ?? "middle";
   }
 
-  fillColor: string;
-  strokeColor: string;
-  x = 0;
-  y = 0;
-  characters: string;
-  fontSize: number;
-  fontFamily: string;
-  direction: CanvasDirection;
-  textAlign: CanvasTextAlign;
-  textBaseline: CanvasTextBaseline;
+  private _x = 0;
+  get x() {
+    return this._x;
+  }
+  set x(value) {
+    this._x = value;
+    this.notifyListeners();
+  }
+
+  private _y = 0;
+  get y() {
+    return this._y;
+  }
+  set y(value) {
+    this._y = value;
+    this.notifyListeners();
+  }
+
+  private _characters: string;
+  get characters(): string {
+    return this._characters;
+  }
+  set characters(value: string) {
+    this._characters = value;
+    this.notifyListeners();
+  }
+
+  private _fontSize: number;
+  get fontSize(): number {
+    return this._fontSize;
+  }
+  set fontSize(value: number) {
+    this._fontSize = value;
+    this.notifyListeners();
+  }
+
+  private _fontFamily: string;
+  get fontFamily(): string {
+    return this._fontFamily;
+  }
+  set fontFamily(value: string) {
+    this._fontFamily = value;
+    this.notifyListeners();
+  }
+
+  private _direction: CanvasDirection;
+  get direction(): CanvasDirection {
+    return this._direction;
+  }
+  set direction(value: CanvasDirection) {
+    this._direction = value;
+    this.notifyListeners();
+  }
+
+  private _textAlign: CanvasTextAlign;
+  get textAlign(): CanvasTextAlign {
+    return this._textAlign;
+  }
+  set textAlign(value: CanvasTextAlign) {
+    this._textAlign = value;
+    this.notifyListeners();
+  }
+
+  private _textBaseline: CanvasTextBaseline;
+  get textBaseline(): CanvasTextBaseline {
+    return this._textBaseline;
+  }
+  set textBaseline(value: CanvasTextBaseline) {
+    this._textBaseline = value;
+    this.notifyListeners();
+  }
+
   removeOnEmpty = true;
 
   draw(context: CanvasContext): void {

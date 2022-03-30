@@ -1,27 +1,35 @@
-import { color, Size } from "../../utils.js";
-import { CanvasContext, CanvasWidget } from "../widget.js";
-import { PolygonShape } from "./polygon.js";
+import { CanvasContext } from "../widget.js";
+import { PolygonOptions, PolygonShape } from "./polygon.js";
+
+export interface StarOptions extends PolygonOptions {
+  innerRadius?: number;
+  outerRadius?: number;
+}
 
 export class StarShape extends PolygonShape {
-  constructor(
-    readonly options: {
-      rect: DOMRect;
-      fillColor?: string;
-      strokeColor?: string;
-      pointCount?: number;
-      innerRadius?: number;
-      outerRadius?: number;
-    }
-  ) {
+  constructor(options: StarOptions) {
     super(options);
+    this.innerRadius = options.innerRadius;
+    this.outerRadius = options.outerRadius;
   }
-  fillColor? = this.options.fillColor;
-  strokeColor? = this.options.strokeColor;
-  rect = this.options.rect;
-  pointCount = this.options.pointCount || 5;
-  innerRadius = this.options.innerRadius;
-  outerRadius = this.options.outerRadius;
-  children?: CanvasWidget[];
+
+  private _innerRadius?: number;
+  get innerRadius(): number {
+    return this._innerRadius;
+  }
+  set innerRadius(value: number) {
+    this._innerRadius = value;
+    this.notifyListeners();
+  }
+
+  private _outerRadius?: number;
+  get outerRadius(): number {
+    return this._outerRadius;
+  }
+  set outerRadius(value: number) {
+    this._outerRadius = value;
+    this.notifyListeners();
+  }
 
   override draw(context: CanvasContext): void {
     const { ctx, size } = context;

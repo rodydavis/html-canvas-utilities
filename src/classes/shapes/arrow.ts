@@ -1,23 +1,37 @@
-import { color, Size } from "../../utils.js";
 import { CanvasContext } from "../widget.js";
-import { LineBase } from "./line.js";
+import { LineBase, LineOptions } from "./line.js";
 
 export type ArrowType = "none" | "line-arrow" | "triangle-arrow";
 
+export interface ArrowOptions extends LineOptions {
+  startArrow?: ArrowType;
+  endArrow?: ArrowType;
+}
+
 export class ArrowShape extends LineBase {
-  constructor(
-    readonly options: {
-      rect: DOMRect;
-      fillColor?: string;
-      strokeColor?: string;
-      startArrow?: ArrowType;
-      endArrow?: ArrowType;
-    }
-  ) {
+  constructor(options: ArrowOptions) {
     super(options);
+    this.startArrow = options.startArrow || "none";
+    this.endArrow = options.endArrow || "line-arrow";
   }
-  startArrow = this.options.startArrow || "none";
-  endArrow = this.options.endArrow || "line-arrow";
+
+  private _startArrow: ArrowType;
+  get startArrow(): ArrowType {
+    return this._startArrow;
+  }
+  set startArrow(value: ArrowType) {
+    this._startArrow = value;
+    this.notifyListeners();
+  }
+
+  private _endArrow: ArrowType;
+  get endArrow(): ArrowType {
+    return this._endArrow;
+  }
+  set endArrow(value: ArrowType) {
+    this._endArrow = value;
+    this.notifyListeners();
+  }
 
   override draw(context: CanvasContext): void {
     const { ctx, size } = context;

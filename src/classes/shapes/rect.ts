@@ -1,24 +1,27 @@
 import { Size } from "../../utils.js";
 import { CanvasContext } from "../widget.js";
-import { ShapeBase } from "./base.js";
+import { VectorBase, VectorOptions } from "./base.js";
 
 export type RectCornerRadius = number | [number, number, number, number];
 
-export class RectShape extends ShapeBase {
-  constructor(
-    readonly options: {
-      rect: DOMRect;
-      fillColor?: string;
-      strokeColor?: string;
-      cornerRadius?: RectCornerRadius;
-    }
-  ) {
-    super();
+export interface RectOptions extends VectorOptions {
+  cornerRadius?: RectCornerRadius;
+}
+
+export class RectShape extends VectorBase {
+  constructor(options: RectOptions) {
+    super(options);
+    this.cornerRadius = options.cornerRadius;
   }
-  fillColor = this.options.fillColor;
-  strokeColor = this.options.strokeColor;
-  rect = this.options.rect;
-  cornerRadius?: RectCornerRadius = this.options.cornerRadius;
+
+  private _cornerRadius?: RectCornerRadius;
+  get cornerRadius(): RectCornerRadius {
+    return this._cornerRadius;
+  }
+  set cornerRadius(value: RectCornerRadius) {
+    this._cornerRadius = value;
+    this.notifyListeners();
+  }
 
   draw(context: CanvasContext): void {
     const { ctx, size } = context;

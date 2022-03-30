@@ -1,21 +1,20 @@
-import { Size } from "../../utils.js";
 import { CanvasContext, CanvasWidget } from "../widget.js";
-import { GroupBase } from "./base.js";
+import { GroupBase, GroupOptions } from "./base.js";
+
+export interface StackOptions extends GroupOptions {
+  rect: DOMRect;
+  clip?: boolean;
+}
 
 export class StackGroup extends GroupBase {
-  constructor(
-    readonly options: {
-      rect: DOMRect;
-      children: CanvasWidget[];
-      clip?: boolean;
-    }
-  ) {
-    super();
+  constructor(options: StackOptions) {
+    super(options);
+    this.rect = options.rect;
+    this.clip = options.clip ?? true;
   }
 
-  children = this.options.children;
-  rect = this.options.rect;
-  clip = this.options.clip ?? true;
+  rect: DOMRect;
+  clip: boolean;
 
   draw(context: CanvasContext): void {
     const { ctx, size } = context;
@@ -63,17 +62,3 @@ export class StackGroup extends GroupBase {
     }
   }
 }
-
-// export class Positioned {
-//   constructor(
-//     readonly options: {
-//       child: CanvasWidget;
-//       top?: number;
-//       left?: number;
-//       bottom?: number;
-//       right?: number;
-//       width?: number;
-//       height?: number;
-//     }
-//   ) {}
-// }
