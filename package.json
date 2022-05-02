@@ -39,6 +39,7 @@
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "build": "rm -rf dist && tsc -p tsconfig.json",
+    "postinstall": "npm run build",
     "dev": "tsc -p tsconfig.json --watch"
   },
   "devDependencies": {
