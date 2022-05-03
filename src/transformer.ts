@@ -62,7 +62,9 @@ export class CanvasTransformer<T> extends Listenable<T> {
     document.addEventListener("keyup", this.onKeyUpEvent.bind(this), false);
 
     // Drag and drop events
-    canvas.addEventListener("dragover", this.onDrop.bind(this), false);
+    document.addEventListener("dragstart", this.onDragStart.bind(this), false);
+    document.addEventListener("dragend", this.onDragEnd.bind(this), false);
+    canvas.addEventListener("dragover", this.onDragOver.bind(this), false);
     canvas.addEventListener("drop", this.onDrop.bind(this), false);
   }
 
@@ -367,6 +369,10 @@ export class CanvasTransformer<T> extends Listenable<T> {
   onClick(e: MouseEvent) {
     this.preventDefault(e);
   }
+
+  onDragStart(e: DragEvent) {}
+
+  onDragEnd(e: DragEvent) {}
 
   onDragOver(e: DragEvent) {
     this.preventDefault(e);

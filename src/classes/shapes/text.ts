@@ -7,6 +7,7 @@ export interface TextOptions extends ShapeOptions {
   offset: Offset;
   fontSize?: number;
   fontFamily?: string;
+  backgroundColor?: string;
   direction?: CanvasDirection;
   textAlign?: CanvasTextAlign;
   textBaseline?: CanvasTextBaseline;
@@ -16,6 +17,7 @@ export class TextShape extends ShapeBase {
   constructor(options: TextOptions) {
     super();
     this.characters = options.characters;
+    this.backgroundColor = options.backgroundColor;
     this.fillColor = options.fillColor;
     this.strokeColor = options.strokeColor;
     this.x = options.offset.x;
@@ -72,6 +74,15 @@ export class TextShape extends ShapeBase {
     this.notifyListeners();
   }
 
+  private _backgroundColor: string;
+  get backgroundColor(): string {
+    return this._backgroundColor;
+  }
+  set backgroundColor(value: string) {
+    this._backgroundColor = value;
+    this.notifyListeners();
+  }
+
   private _direction: CanvasDirection;
   get direction(): CanvasDirection {
     return this._direction;
@@ -106,6 +117,10 @@ export class TextShape extends ShapeBase {
     ctx.save();
     const { width, height } = this.text(ctx);
     ctx.translate(0, height / 2);
+    if (this.backgroundColor) {
+      ctx.fillStyle = this.backgroundColor;
+      ctx.fillRect(0, 0, width, height);
+    }
     if (this.fillColor) {
       ctx.fillStyle = context.resolveValue(this.fillColor);
       ctx.fillText(this.characters, 0, 0);

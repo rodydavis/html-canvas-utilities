@@ -1,12 +1,11 @@
 import { CanvasContext, CanvasWidget, TextShape } from "./classes";
 import { drawInfiniteGrid } from "./infinite-grid";
 import {
-  CanvasInfo,
   CanvasTransformer,
   CanvasTransformerOptions,
   defaultOptions,
 } from "./transformer";
-import { color, Offset, outerRect, Size } from "./utils";
+import { Offset, outerRect, Size } from "./utils";
 
 export interface CanvasControllerOptions extends CanvasTransformerOptions {
   drawBackground?: (
@@ -138,7 +137,11 @@ export class CanvasController<
     }
   }
 
-  drawChild(ctx: CanvasRenderingContext2D, child: T, time: number) {
+  drawChild<C extends CanvasWidget = T>(
+    ctx: CanvasRenderingContext2D,
+    child: C,
+    time: number
+  ) {
     const offset = child.offset;
     ctx.save();
     ctx.translate(offset.x, offset.y);
