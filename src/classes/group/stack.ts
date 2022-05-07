@@ -24,6 +24,7 @@ export class StackGroup extends GroupBase {
       ctx.beginPath();
       ctx.rect(0, 0, size.width, size.height);
       ctx.clip();
+      ctx.restore();
     }
     for (const item of this.children) {
       ctx.translate(item.rect.x, item.rect.y);

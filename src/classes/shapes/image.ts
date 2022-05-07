@@ -1,9 +1,8 @@
 import { CanvasContext } from "../widget.js";
-import { VectorOptions } from "./base.js";
-import { RectShape, roundedRect } from "./rect.js";
+import { RectOptions, RectShape, roundedRect } from "./rect.js";
 
-export interface ImageOptions extends VectorOptions {
-  image: string;
+export interface ImageOptions extends RectOptions {
+  image?: string;
   filter?: string;
   smoothingEnabled?: boolean;
   smoothingQuality?: ImageSmoothingQuality;
@@ -12,27 +11,45 @@ export interface ImageOptions extends VectorOptions {
 export class ImageShape extends RectShape {
   constructor(options: ImageOptions) {
     super(options);
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = options.image;
-    this.image = img;
-    img.onload = () => {
-      this.loaded = true;
-    };
-    img.onerror = () => {
-      this.error = true;
-      this.loaded = true;
-    };
     this.smoothingEnabled = options.smoothingEnabled;
     this.smoothingQuality = options.smoothingQuality;
     this.filter = options.filter;
+    this.src = options.image;
   }
-  image: HTMLImageElement;
+  image = new Image();
   loaded = false;
   error = false;
   smoothingEnabled?: boolean;
   smoothingQuality?: ImageSmoothingQuality;
   filter?: string;
+
+  private _src: string = "";
+  get src(): string {
+    return this._src;
+  }
+  set src(value: string) {
+    this._src = value;
+    this.load(value);
+  }
+
+  private load(src: string) {
+    this.loaded = false;
+    const img = new Image();
+    if (src) {
+      img.crossOrigin = "anonymous";
+      img.src = src;
+      img.onload = () => {
+        this.loaded = true;
+        this.notifyListeners();
+      };
+      img.onerror = () => {
+        this.error = true;
+        this.loaded = true;
+        this.notifyListeners();
+      };
+    }
+    this.image = img;
+  }
 
   draw(context: CanvasContext): void {
     const { ctx, size } = context;

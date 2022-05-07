@@ -1,10 +1,10 @@
-import { drawOutline } from "../utils.js";
-import { RectShape, VectorOptions } from "./shapes/index.js";
-import { CanvasContext, CanvasWidget } from "./widget.js";
+import { drawOutline } from "../../utils.js";
+import { RectShape, RectOptions } from "./index.js";
+import { CanvasContext, CanvasWidget } from "../widget.js";
 
 export type EdgeInsets = number | [number, number, number, number];
 
-export interface BoxOptions extends VectorOptions {
+export interface BoxOptions extends RectOptions {
   padding?: EdgeInsets;
   child: CanvasWidget;
 }

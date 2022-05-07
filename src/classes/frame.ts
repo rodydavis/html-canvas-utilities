@@ -1,4 +1,4 @@
-import { BoxBase, BoxOptions } from "./box";
+import { BoxBase, BoxOptions } from "./shapes/box";
 import { CanvasContext } from "./widget";
 
 export interface FrameOptions extends BoxOptions {

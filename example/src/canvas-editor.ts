@@ -5,6 +5,7 @@ import { addRandomShapes } from "./demo/shapes.js";
 import { generateText } from "./demo/segmented-display.js";
 import { colorDemo } from "./demo/color.js";
 import { addText } from "./demo/text.js";
+import { addDom } from "./demo/dom.js";
 
 @customElement("canvas-editor")
 export class CanvasEditor extends LitElement {
@@ -50,6 +51,7 @@ export class CanvasEditor extends LitElement {
     colorDemo(controller);
     addRandomShapes(controller);
     addText(controller);
+    addDom(controller);
   }
 }
 
