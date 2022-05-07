@@ -45,6 +45,15 @@ export function drawOutline(context: CanvasContext, strokeColor: string) {
   ctx.restore();
 }
 
+export function pxSize(value?: string): number | undefined {
+  if (value) {
+    if (value.endsWith("px")) return Number(value.replace("px", ""));
+    return Number(value);
+  }
+  return undefined;
+}
+
+
 export interface Offset {
   x: number;
   y: number;

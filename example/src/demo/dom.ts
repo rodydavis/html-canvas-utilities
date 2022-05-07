@@ -17,6 +17,8 @@ export function addDom(controller: CanvasController) {
     },
   });
   controller.addChild(dom);
+  // TODO: Offline support
+  // TODO: Add SSR example with Lit
   const element = document.createElement("mwc-button");
   const wc = new DomShape({
     rect: new DOMRect(250, 20, 100, 36),
