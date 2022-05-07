@@ -1,11 +1,11 @@
 import { html, css, LitElement } from "lit";
 import { customElement, query } from "lit/decorators.js";
-import { CanvasController } from "html-canvas-utilities";
-import { addRandomShapes } from "./demo/shapes.js";
-import { generateText } from "./demo/segmented-display.js";
-import { colorDemo } from "./demo/color.js";
-import { addText } from "./demo/text.js";
-import { addDom } from "./demo/dom.js";
+import {
+  CanvasLayer,
+  CanvasTransformer,
+  CanvasView,
+  InfiniteGrid,
+} from "html-canvas-utilities";
 
 @customElement("canvas-editor")
 export class CanvasEditor extends LitElement {
@@ -19,6 +19,10 @@ export class CanvasEditor extends LitElement {
       cursor: pointer;
       user-select: none;
       user-zoom: none;
+    }
+    #canvas {
+      width: 100%;
+      height: 100%;
     }
     @media (prefers-color-scheme: dark) {
       * {
@@ -39,19 +43,47 @@ export class CanvasEditor extends LitElement {
 
   firstUpdated() {
     const canvas = this.canvas;
-    const controller = new CanvasController(canvas);
-    controller.addListener(() => {
-      const { offset, scale } = controller.info;
-      console.debug(`offset: ${offset.x}, ${offset.y}; scale: ${scale}`);
+    const transformer = new CanvasTransformer();
+    const controller = new CanvasView({
+      canvas,
+      plugins: [transformer],
     });
-    controller.init();
+    // controller.addListener(() => {
+    //   const { offset, scale } = controller.info;
+    //   console.debug(`offset: ${offset.x}, ${offset.y}; scale: ${scale}`);
+    // });
+    const bgLayer = new InfiniteGrid({
+      plugins: [transformer],
+    });
+    controller.addLayer(bgLayer);
+
+    const layer = new SquareDemo({
+      plugins: [transformer],
+    });
+    controller.addLayer(layer);
+
+    controller.start();
+
+    // Wait 3 seconds and stop
+    // setTimeout(() => controller.stop(), 3000);
 
     // Add Demos
-    generateText(controller);
-    colorDemo(controller);
-    addRandomShapes(controller);
-    addText(controller);
-    addDom(controller);
+    // generateText(controller);
+    // colorDemo(controller);
+    // addRandomShapes(controller);
+    // addText(controller);
+    // addDom(controller);
+  }
+}
+
+class SquareDemo extends CanvasLayer {
+  draw(ctx: CanvasRenderingContext2D, timestamp: number): void {
+    super.draw(ctx, timestamp);
+    const x = Math.sin(timestamp / 1000) * 100;
+    const y = Math.cos(timestamp / 1000) * 100;
+    const offset = 100;
+    ctx.fillStyle = "red";
+    ctx.fillRect(x + offset, y + offset, 100, 100);
   }
 }
 
