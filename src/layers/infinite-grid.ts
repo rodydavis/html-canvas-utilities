@@ -1,6 +1,6 @@
+import { CanvasTransformer } from "../transformer";
 import { cssValue } from "../utils/style";
 import { CanvasLayer } from "./base";
-import { CanvasTransformer } from "./transformer";
 
 export class InfiniteGrid extends CanvasLayer {
   offset: { x: number; y: number } = { x: 0, y: 0 };

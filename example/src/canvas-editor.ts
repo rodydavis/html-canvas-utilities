@@ -1,11 +1,7 @@
 import { html, css, LitElement } from "lit";
 import { customElement, query } from "lit/decorators.js";
-import {
-  CanvasLayer,
-  CanvasTransformer,
-  CanvasView,
-  InfiniteGrid,
-} from "html-canvas-utilities";
+import { canvasDemo } from "./demo/canvas";
+import { gameDemo } from "./demo/game";
 
 @customElement("canvas-editor")
 export class CanvasEditor extends LitElement {
@@ -43,27 +39,7 @@ export class CanvasEditor extends LitElement {
 
   firstUpdated() {
     const canvas = this.canvas;
-    const transformer = new CanvasTransformer();
-    const controller = new CanvasView({
-      canvas,
-      plugins: [transformer],
-    });
-    // controller.addListener(() => {
-    //   const { offset, scale } = controller.info;
-    //   console.debug(`offset: ${offset.x}, ${offset.y}; scale: ${scale}`);
-    // });
-    const bgLayer = new InfiniteGrid({
-      plugins: [transformer],
-    });
-    controller.addLayer(bgLayer);
-
-    const layer = new SquareDemo({
-      plugins: [transformer],
-    });
-    controller.addLayer(layer);
-
-    controller.start();
-
+    gameDemo(canvas);
     // Wait 3 seconds and stop
     // setTimeout(() => controller.stop(), 3000);
 
@@ -73,17 +49,6 @@ export class CanvasEditor extends LitElement {
     // addRandomShapes(controller);
     // addText(controller);
     // addDom(controller);
-  }
-}
-
-class SquareDemo extends CanvasLayer {
-  draw(ctx: CanvasRenderingContext2D, timestamp: number): void {
-    super.draw(ctx, timestamp);
-    const x = Math.sin(timestamp / 1000) * 100;
-    const y = Math.cos(timestamp / 1000) * 100;
-    const offset = 100;
-    ctx.fillStyle = "red";
-    ctx.fillRect(x + offset, y + offset, 100, 100);
   }
 }
 

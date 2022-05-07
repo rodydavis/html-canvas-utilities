@@ -1,4 +1,5 @@
-import { CanvasLayer, CanvasPlugin } from "./plugins/base";
+import { CanvasLayer } from "./layers";
+import { CanvasPlugin } from "./plugins/base";
 import { pxSize } from "./utils";
 
 export interface CanvasOptions {
@@ -26,12 +27,14 @@ export class CanvasView extends CanvasPlugin {
     this.playing = true;
     this.resize();
     this.animate(0);
+    this.layers.forEach((plugin) => plugin.start(this.ctx));
     this.dispatch(new Event("canvas-start"));
   }
 
   stop() {
     this.playing = false;
     cancelAnimationFrame(this.animate.bind(this));
+    this.layers.forEach((plugin) => plugin.stop(this.ctx));
     this.dispatch(new Event("canvas-stop"));
   }
 
@@ -65,6 +68,7 @@ export class CanvasView extends CanvasPlugin {
   }
 
   addLayer(layer: CanvasLayer) {
+    layer.start(this.ctx);
     this.layers.push(layer);
   }
 
