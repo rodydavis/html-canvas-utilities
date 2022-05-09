@@ -5,6 +5,7 @@ import {
   WidgetsLayer,
 } from "html-canvas-utilities";
 import { colorDemo } from "./color";
+import { addDom } from "./dom";
 import { displayDemo } from "./segmented-display";
 import { addRandomShapes } from "./shapes";
 
@@ -26,6 +27,7 @@ export function widgetsDemo(canvas: HTMLCanvasElement) {
   displayDemo(layer);
   addRandomShapes(controller, layer);
   colorDemo(layer);
+  addDom(layer);
   controller.addLayer(layer);
 
   controller.start();

@@ -27,14 +27,14 @@ export class CanvasView extends CanvasPlugin {
     this.playing = true;
     this.resize();
     this.animate(0);
-    this.layers.forEach((plugin) => plugin.start(this.ctx));
+    this.layers.forEach((layer) => layer.start(this.ctx));
     this.dispatch(new Event("canvas-start"));
   }
 
   stop() {
     this.playing = false;
     cancelAnimationFrame(this.animate.bind(this));
-    this.layers.forEach((plugin) => plugin.stop(this.ctx));
+    this.layers.forEach((layer) => layer.stop(this.ctx));
     this.dispatch(new Event("canvas-stop"));
   }
 
@@ -43,6 +43,8 @@ export class CanvasView extends CanvasPlugin {
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = rect.height;
+    this.layers.forEach((layer) => layer.resize(rect));
+    this.plugins.forEach((plugin) => plugin.resize(rect));
     this.dispatch(new Event("canvas-resize"));
   }
 

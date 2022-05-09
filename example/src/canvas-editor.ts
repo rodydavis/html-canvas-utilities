@@ -1,6 +1,6 @@
 import { html, css, LitElement } from "lit";
 import { customElement, query } from "lit/decorators.js";
-import { canvasDemo } from "./demo/canvas";
+import { basicDemo } from "./demo/basic";
 import { gameDemo } from "./demo/game";
 import { widgetsDemo } from "./demo/widgets";
 
@@ -40,19 +40,12 @@ export class CanvasEditor extends LitElement {
 
   firstUpdated() {
     const canvas = this.canvas;
-    widgetsDemo(canvas);
-    // canvasDemo(canvas);
+    basicDemo(canvas);
+    // widgetsDemo(canvas);
     // gameDemo(canvas);
 
     // Wait 3 seconds and stop
     // setTimeout(() => controller.stop(), 3000);
-
-    // Add Demos
-    // generateText(controller);
-    // colorDemo(controller);
-    // addRandomShapes(controller);
-    // addText(controller);
-    // addDom(controller);
   }
 }
 

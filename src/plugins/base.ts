@@ -18,4 +18,6 @@ export abstract class CanvasPlugin {
   afterDraw(ctx: CanvasRenderingContext2D, timestamp: number) {}
 
   animate(timestamp: number) {}
+
+  resize(rect: DOMRect) {}
 }

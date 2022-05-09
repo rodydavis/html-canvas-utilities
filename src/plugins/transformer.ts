@@ -5,12 +5,42 @@ export interface CanvasTransformerOptions {
   offset?: DOMPoint;
   canPan?: boolean;
   canZoom?: boolean;
+  keyboardNavigation?: boolean;
+  maxScale?: number;
+  minScale?: number;
+  // maxBounds?: Bounds;
 }
+
+// export interface Bounds {
+//   minX: number;
+//   minY: number;
+//   maxX: number;
+//   maxY: number;
+// }
 
 export class CanvasTransformer extends CanvasPlugin {
   constructor(readonly options: CanvasTransformerOptions = {}) {
     super();
+    this.keyboardNavigation = options.keyboardNavigation ?? true;
+    this.maxScale = options.maxScale ?? 10;
+    this.minScale = options.minScale ?? 0.1;
+    // this.maxBounds = options.maxBounds;
   }
+
+  touches?: TouchList;
+  mouse = new DOMPoint(0, 0);
+  gestureEvent = false;
+  mouseDown = false;
+  spacePressed = false;
+  controlPressed = false;
+  shiftPressed = false;
+  metaPressed = false;
+  middleClick = false;
+  keyboardNavigation: boolean;
+  minScale: number;
+  maxScale: number;
+  maxBounds?: Bounds;
+  _previousGesture: MouseEvent & GestureEvent;
 
   init(canvas: HTMLCanvasElement, plugins: CanvasPlugin[]) {
     super.init(canvas, plugins);
@@ -85,20 +115,6 @@ export class CanvasTransformer extends CanvasPlugin {
     this.canvas.addEventListener("dragover", this.onDrop.bind(this), false);
     this.canvas.addEventListener("drop", this.onDrop.bind(this), false);
   }
-
-  gestureEvent = false;
-  touches?: TouchList;
-  mouse = new DOMPoint(0, 0);
-  mouseDown = false;
-  spacePressed = false;
-  controlPressed = false;
-  shiftPressed = false;
-  metaPressed = false;
-  middleClick = false;
-  keyboardEvents = true;
-  minScale = 0.1;
-  maxScale = 10;
-  _previousGesture: MouseEvent & GestureEvent;
 
   private transform: DOMMatrix;
   get matrix() {
@@ -206,14 +222,47 @@ export class CanvasTransformer extends CanvasPlugin {
     if (!this.canPan) return;
     if (Number.isNaN(delta)) return;
     const { scale } = this.info;
+    const oldX = this.options.offset.x;
+    const oldY = this.options.offset.y;
     this.options.offset.x += delta.x / scale;
     this.options.offset.y += delta.y / scale;
+    const oldMatrix = this.matrix;
     this.matrix = this.matrix.translate(
       delta.x / scale,
       delta.y / scale,
       delta.z / scale
     );
+    // if (!this.inBounds()) {
+    //   this.matrix = oldMatrix;
+    //   this.options.offset.x = oldX;
+    //   this.options.offset.y = oldY;
+    // }
   }
+
+  // inBounds() {
+  //   if (this.maxBounds) {
+  //     const info = this.info;
+  //     const width = this.canvas.width;
+  //     const height = this.canvas.height;
+  //     const scale = info.scale;
+  //     const dx = info.offset.x;
+  //     const dy = info.offset.y;
+
+  //     console.log(dx, dy, scale, width, height);
+
+  //     const minX = this.maxBounds.minX;
+  //     const minY = this.maxBounds.minY;
+  //     const maxX = this.maxBounds.maxX;
+  //     const maxY = this.maxBounds.maxY;
+
+  //     console.log(minX, minY, maxX, maxY);
+
+  //     if (dx < minX || dy < minY || dx > maxX || dy > maxY) {
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // }
 
   get info(): CanvasInfo {
     const { scaleX, scaleY, translateX, translateY, rotate } = decomposeMatrix(
@@ -349,21 +398,25 @@ export class CanvasTransformer extends CanvasPlugin {
   }
 
   onKeyDownEvent(e: KeyboardEvent) {
-    const isActive = this.canvas === document.activeElement;
-    if (!isActive && !this.keyboardEvents) return;
+    const isActive =
+      this.canvas === document.activeElement ||
+      this.canvas.contains(document.activeElement);
+    if (!isActive) return;
     this.preventDefault(e);
-    if (e.key === "ArrowLeft") {
-      this.pan(new DOMPoint(-10, 0));
-    } else if (e.key === "ArrowRight") {
-      this.pan(new DOMPoint(10, 0));
-    } else if (e.key === "ArrowUp") {
-      this.pan(new DOMPoint(0, -10));
-    } else if (e.key === "ArrowDown") {
-      this.pan(new DOMPoint(0, 10));
-    } else if (e.key === "=") {
-      this.scale(1.1, this.mouse);
-    } else if (e.key === "-") {
-      this.scale(1 / 1.1, this.mouse);
+    if (this.keyboardNavigation) {
+      if (e.key === "ArrowLeft") {
+        this.pan(new DOMPoint(-10, 0));
+      } else if (e.key === "ArrowRight") {
+        this.pan(new DOMPoint(10, 0));
+      } else if (e.key === "ArrowUp") {
+        this.pan(new DOMPoint(0, -10));
+      } else if (e.key === "ArrowDown") {
+        this.pan(new DOMPoint(0, 10));
+      } else if (e.key === "=") {
+        this.scale(1.1, this.mouse);
+      } else if (e.key === "-") {
+        this.scale(1 / 1.1, this.mouse);
+      }
     }
     this.controlPressed = e.ctrlKey;
     this.shiftPressed = e.shiftKey;
@@ -429,6 +482,8 @@ export class CanvasTransformer extends CanvasPlugin {
   draw(ctx: CanvasRenderingContext2D, timestamp: number): void {
     ctx.setTransform(this.transform);
   }
+
+  resize(rect: DOMRect): void {}
 }
 
 // https://gist.github.com/fwextensions/2052247
