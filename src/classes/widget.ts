@@ -1,7 +1,6 @@
 import { CanvasEvent, ClickEvent, FrameUpdate, HoverEvent } from "../events.js";
 import { Listenable } from "../listenable.js";
-import { CanvasInfo } from "../transformer.js";
-import { drawOutline, Offset, Rect, Size } from "../utils.js";
+import { drawOutline, Offset, Rect, Size } from "../utils/index.js";
 
 export abstract class CanvasWidget extends Listenable<CanvasEvent> {
   abstract draw(context: CanvasContext, parent?: Size): void;
@@ -89,8 +88,10 @@ export abstract class CanvasWidget extends Listenable<CanvasEvent> {
   }
 }
 
-export interface CanvasContext extends CanvasInfo {
+export interface CanvasContext {
   ctx: CanvasRenderingContext2D;
   size: Size;
+  scale: number;
+  offset: Offset;
   resolveValue: (value: string) => string;
 }

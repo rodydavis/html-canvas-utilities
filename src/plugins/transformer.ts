@@ -95,6 +95,7 @@ export class CanvasTransformer extends CanvasPlugin {
   shiftPressed = false;
   metaPressed = false;
   middleClick = false;
+  keyboardEvents = true;
   minScale = 0.1;
   maxScale = 10;
   _previousGesture: MouseEvent & GestureEvent;
@@ -349,7 +350,7 @@ export class CanvasTransformer extends CanvasPlugin {
 
   onKeyDownEvent(e: KeyboardEvent) {
     const isActive = this.canvas === document.activeElement;
-    if (!isActive) return;
+    if (!isActive && !this.keyboardEvents) return;
     this.preventDefault(e);
     if (e.key === "ArrowLeft") {
       this.pan(new DOMPoint(-10, 0));

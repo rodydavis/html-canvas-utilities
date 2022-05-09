@@ -1,7 +1,8 @@
 import { BoxBase } from "html-canvas-utilities";
 import {
   ArrowShape,
-  CanvasController,
+  WidgetsLayer,
+  CanvasView,
   EllipseShape,
   ImageShape,
   LineBase,
@@ -12,7 +13,7 @@ import {
   Frame,
 } from "html-canvas-utilities";
 
-export function addRandomShapes(controller: CanvasController) {
+export function addRandomShapes(controller: CanvasView, layer: WidgetsLayer) {
   // Add some shapes
   const shapes = ["circle", "rect", "star", "polygon", "line", "arrow"];
   for (let i = 0; i < 20; i++) {
@@ -23,7 +24,7 @@ export function addRandomShapes(controller: CanvasController) {
     };
     const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
     if (shape === "rect") {
-      controller.addChild(
+      layer.addChild(
         new RectShape({
           rect: new DOMRect(x, y, 100, 100),
           fillColor: color,
@@ -32,7 +33,7 @@ export function addRandomShapes(controller: CanvasController) {
       );
     }
     if (shape === "circle") {
-      controller.addChild(
+      layer.addChild(
         new EllipseShape({
           rect: new DOMRect(x, y, 100, 100),
           fillColor: color,
@@ -40,7 +41,7 @@ export function addRandomShapes(controller: CanvasController) {
       );
     }
     if (shape === "star") {
-      controller.addChild(
+      layer.addChild(
         new StarShape({
           rect: new DOMRect(x, y, 100, 100),
           fillColor: color,
@@ -48,7 +49,7 @@ export function addRandomShapes(controller: CanvasController) {
       );
     }
     if (shape === "polygon") {
-      controller.addChild(
+      layer.addChild(
         new PolygonShape({
           rect: new DOMRect(x, y, 100, 100),
           fillColor: color,
@@ -57,7 +58,7 @@ export function addRandomShapes(controller: CanvasController) {
       );
     }
     if (shape === "line") {
-      controller.addChild(
+      layer.addChild(
         new LineBase({
           rect: new DOMRect(x, y, 100, 1),
           strokeColor: color,
@@ -65,7 +66,7 @@ export function addRandomShapes(controller: CanvasController) {
       );
     }
     if (shape === "arrow") {
-      controller.addChild(
+      layer.addChild(
         new ArrowShape({
           rect: new DOMRect(x, y, 100, 1),
           strokeColor: color,
@@ -81,7 +82,7 @@ export function addRandomShapes(controller: CanvasController) {
       x: Math.random() * controller.canvas.width,
       y: Math.random() * controller.canvas.height,
     };
-    controller.addChild(
+    layer.addChild(
       new ImageShape({
         rect: new DOMRect(x, y, 100, 100),
         image: `https://picsum.photos/seed/seed-${i + 1}/300/300`,
@@ -94,7 +95,7 @@ export function addRandomShapes(controller: CanvasController) {
     x: Math.random() * controller.canvas.width,
     y: Math.random() * controller.canvas.height,
   };
-  controller.addChild(
+  layer.addChild(
     new StackGroup({
       clip: false,
       rect: new DOMRect(x, y, 100, 100),
@@ -119,7 +120,7 @@ export function addRandomShapes(controller: CanvasController) {
   );
 
   // Add flex
-  controller.addChild(
+  layer.addChild(
     new BoxBase({
       rect: new DOMRect(1000, 1000, 100, 100),
       fillColor: "gray",
@@ -131,7 +132,7 @@ export function addRandomShapes(controller: CanvasController) {
       }),
     })
   );
-  controller.addChild(
+  layer.addChild(
     new Frame({
       label: "Frame",
       rect: new DOMRect(600, 600, 100, 100),

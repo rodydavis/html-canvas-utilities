@@ -1,42 +1,42 @@
-import { CanvasController, RectShape } from "html-canvas-utilities";
+import { RectShape, WidgetsLayer } from "html-canvas-utilities";
 
 const padding = 2;
 const size = { width: 50, height: 50 };
 const offset = { x: 250, y: 250 };
 
-export function generateText(controller: CanvasController) {
+export function displayDemo(layer: WidgetsLayer) {
   // Spell out "Hello" in boxes
   const width = (size.width + padding) * 3 + size.width / 2;
 
-  eightSegmentDisplay(controller, offset.x, [
+  eightSegmentDisplay(layer, offset.x, [
     [1, 0, 1],
     [1, 0, 1],
     [1, 1, 1],
     [1, 0, 1],
     [1, 0, 1],
   ]);
-  eightSegmentDisplay(controller, offset.x + width, [
+  eightSegmentDisplay(layer, offset.x + width, [
     [1, 1, 1],
     [1, 0, 0],
     [1, 1, 1],
     [1, 0, 0],
     [1, 1, 1],
   ]);
-  eightSegmentDisplay(controller, offset.x + width * 2, [
+  eightSegmentDisplay(layer, offset.x + width * 2, [
     [1, 0, 0],
     [1, 0, 0],
     [1, 0, 0],
     [1, 0, 0],
     [1, 1, 1],
   ]);
-  eightSegmentDisplay(controller, offset.x + width * 3, [
+  eightSegmentDisplay(layer, offset.x + width * 3, [
     [1, 0, 0],
     [1, 0, 0],
     [1, 0, 0],
     [1, 0, 0],
     [1, 1, 1],
   ]);
-  eightSegmentDisplay(controller, offset.x + width * 4, [
+  eightSegmentDisplay(layer, offset.x + width * 4, [
     [1, 1, 1],
     [1, 0, 1],
     [1, 0, 1],
@@ -46,7 +46,7 @@ export function generateText(controller: CanvasController) {
 }
 
 function eightSegmentDisplay(
-  controller: CanvasController,
+  layer: WidgetsLayer,
   offsetX: number,
   digit: Digit
 ) {
@@ -60,7 +60,7 @@ function eightSegmentDisplay(
         });
         box.rect.x += j * (box.rect.width + padding);
         box.rect.y += i * (box.rect.height + padding);
-        controller.addChild(box);
+        layer.addChild(box);
         const boxX = box.rect.x;
         const boxY = box.rect.y;
         box.onUpdate = (time) => {

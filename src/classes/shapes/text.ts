@@ -1,4 +1,4 @@
-import { Offset } from "../../utils.js";
+import { Offset } from "../../utils";
 import { CanvasContext } from "../widget.js";
 import { ShapeBase, ShapeOptions } from "./base.js";
 

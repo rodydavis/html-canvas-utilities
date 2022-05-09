@@ -1,4 +1,4 @@
-import { drawOutline } from "../../utils.js";
+import { drawOutline } from "../../utils";
 import { RectShape, RectOptions } from "./index.js";
 import { CanvasContext, CanvasWidget } from "../widget.js";
 

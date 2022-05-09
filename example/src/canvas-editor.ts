@@ -2,6 +2,7 @@ import { html, css, LitElement } from "lit";
 import { customElement, query } from "lit/decorators.js";
 import { canvasDemo } from "./demo/canvas";
 import { gameDemo } from "./demo/game";
+import { widgetsDemo } from "./demo/widgets";
 
 @customElement("canvas-editor")
 export class CanvasEditor extends LitElement {
@@ -39,7 +40,10 @@ export class CanvasEditor extends LitElement {
 
   firstUpdated() {
     const canvas = this.canvas;
-    gameDemo(canvas);
+    widgetsDemo(canvas);
+    // canvasDemo(canvas);
+    // gameDemo(canvas);
+
     // Wait 3 seconds and stop
     // setTimeout(() => controller.stop(), 3000);
 

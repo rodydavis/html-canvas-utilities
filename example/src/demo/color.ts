@@ -1,6 +1,6 @@
-import { CanvasController, RectShape } from "html-canvas-utilities";
+import { WidgetsLayer, RectShape } from "html-canvas-utilities";
 
-export function colorDemo(controller: CanvasController) {
+export function colorDemo(layer: WidgetsLayer) {
   //   const stops = [0, 0.25, 0.5, 0.75, 1];
   const rect = new RectShape({
     rect: new DOMRect(100, 500, 150, 150),
@@ -13,7 +13,7 @@ export function colorDemo(controller: CanvasController) {
     const hue = (h + 360 * amount) % 360;
     rect.fillColor = `hsl(${hue}, 100%, 50%)`;
   };
-  controller.addChild(rect);
+  layer.addChild(rect);
 }
 
 function hsl(color: string) {

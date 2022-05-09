@@ -1,4 +1,4 @@
-import { Offset } from "./utils.js";
+import { Offset } from "./utils";
 
 export interface CanvasEvent {
   type: "click" | "hover" | "update";

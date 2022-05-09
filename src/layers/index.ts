@@ -2,4 +2,5 @@
 export * from './base'
 export * from './infinite-grid'
 export * from './inline'
+export * from './widgets'
 // @endindex

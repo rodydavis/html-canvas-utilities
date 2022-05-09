@@ -1,4 +1,4 @@
-import { Size } from "../../utils.js";
+import { Size } from "../../utils";
 import { CanvasContext } from "../widget.js";
 import { VectorBase, VectorOptions } from "./base.js";
 

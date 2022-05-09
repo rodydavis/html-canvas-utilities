@@ -1,6 +1,5 @@
 import { CanvasLayer } from "./layers";
 import { CanvasPlugin } from "./plugins/base";
-import { pxSize } from "./utils";
 
 export interface CanvasOptions {
   canvas?: HTMLCanvasElement;
@@ -15,6 +14,7 @@ export class CanvasView extends CanvasPlugin {
     this.init(this.canvas, this.plugins);
     this.plugins.forEach((plugin) => plugin.init(this.canvas, this.plugins));
     window.addEventListener("resize", this.resize.bind(this), false);
+    this.resize();
   }
 
   canvas: HTMLCanvasElement;
@@ -39,13 +39,10 @@ export class CanvasView extends CanvasPlugin {
   }
 
   resize() {
-    const style = getComputedStyle(this.canvas);
-    const cw = pxSize(style.width);
-    const ch = pxSize(style.height);
-    const width = cw || window.innerWidth;
-    const height = ch || window.innerHeight;
-    this.canvas.width = width;
-    this.canvas.height = height;
+    const canvas = this.canvas;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
     this.dispatch(new Event("canvas-resize"));
   }
 

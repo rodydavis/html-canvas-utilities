@@ -11,7 +11,7 @@ export function canvasDemo(canvas: HTMLCanvasElement) {
     canvas,
     plugins: [transformer],
   });
-  
+
   const bgLayer = new InfiniteGrid({
     plugins: [transformer],
   });
@@ -32,6 +32,6 @@ class SquareDemo extends CanvasLayer {
     const y = Math.cos(timestamp / 1000) * 100;
     const offset = 100;
     ctx.fillStyle = "red";
-    ctx.fillRect(x + offset, y + offset, 100, 100);
+    ctx.fillRect(0, 0, 100, 100);
   }
 }
