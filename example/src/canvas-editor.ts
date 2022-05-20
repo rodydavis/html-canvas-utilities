@@ -15,6 +15,9 @@ export class CanvasEditor extends LitElement {
       --canvas-selected-color: #f00;
       --canvas-hovered-color: #0f0;
       --canvas-text-color: #000;
+      --block-background-color: #eee;
+      --block-border-color: rgb(216, 216, 216);
+      --block-node-color: rgb(30, 30, 30);
       cursor: pointer;
       user-select: none;
       user-zoom: none;
@@ -26,6 +29,9 @@ export class CanvasEditor extends LitElement {
         --canvas-selected-color: #bd0303;
         --canvas-hovered-color: #04a104;
         --canvas-text-color: #fff;
+        --block-background-color: #444;
+        --block-border-color: rgb(216, 216, 216);
+        --block-node-color: rgb(30, 30, 30);
       }
     }
   `;
