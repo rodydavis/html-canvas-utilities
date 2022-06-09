@@ -113,59 +113,60 @@ controller.init();
 ```js
 import { html, css, LitElement } from "lit";
 import { customElement, query } from "lit/decorators.js";
-import { CanvasController } from "./controller";
-import { addRandomShapes } from "./shapes";
+import { CanvasController, RectShape } from "html-canvas-utilities";
 
 @customElement("canvas-editor")
 export class CanvasEditor extends LitElement {
-  static styles = css`
-    canvas {
+    static styles = css`
+    * {
       --canvas-background-color: #fafafa;
       --canvas-grid-color: #ccc;
       --canvas-selected-color: #f00;
       --canvas-hovered-color: #0f0;
-      width: 100%;
-      height: 100%;
+      --canvas-text-color: #000;
+      cursor: pointer;
+      user-select: none;
+      user-zoom: none;
     }
     @media (prefers-color-scheme: dark) {
-      canvas {
+      * {
         --canvas-background-color: #333;
         --canvas-grid-color: #666;
         --canvas-selected-color: #bd0303;
         --canvas-hovered-color: #04a104;
+        --canvas-text-color: #fff;
       }
     }
   `;
 
-  @query("#canvas") canvas!: HTMLCanvasElement;
+    @query("#canvas") canvas!: HTMLCanvasElement;
 
-  render() {
-    return html` <canvas id="canvas"></canvas> `;
-  }
+    render() {
+        return html` <canvas id="canvas"></canvas> `;
+    }
 
-  firstUpdated() {
-    const controller = new CanvasController(this.canvas);
-    controller.addListener(() => {
-      const { offset, scale } = controller.info;
-      console.debug(`offset: ${offset.x}, ${offset.y}; scale: ${scale}`);
-    });  
-    controller.addChild({
-        rect: new DOMRect(0, 0, 100, 100),
-        draw: (ctx: CanvasRenderingContext2D) => {
-            ctx.save();
-            ctx.fillStyle = 'red';
-            ctx.fillRect(0, 0, 100, 100);
-            ctx.restore();
-        },
-    });
-    controller.init();
-  }
+    firstUpdated() {
+
+        const controller = new CanvasController(this.canvas);
+        controller.addListener(() => {
+            const { offset, scale } = controller.info;
+            console.debug(`offset: ${offset.x}, ${offset.y}; scale: ${scale}`);
+        });
+        const box = new RectShape({
+            rect: new DOMRect(0, 0, 50, 50),
+            fillColor: "red",
+            cornerRadius: 0,
+        });
+        controller.addChild(box);
+        controller.init();
+    }
+
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    "canvas-editor": CanvasEditor;
-  }
+    interface HTMLElementTagNameMap {
+        "canvas-editor": CanvasEditor;
+    }
 }
 
 ```
