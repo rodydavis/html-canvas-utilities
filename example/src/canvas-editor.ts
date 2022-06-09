@@ -1,10 +1,10 @@
 import { html, css, LitElement } from "lit";
 import { customElement, query } from "lit/decorators.js";
 import { CanvasController } from "html-canvas-utilities";
-import { addRandomShapes } from "./demo/shapes.js";
-import { generateText } from "./demo/segmented-display.js";
-import { colorDemo } from "./demo/color.js";
-import { addText } from "./demo/text.js";
+import { addRandomShapes } from "./demo/shapes";
+import { generateText } from "./demo/segmented-display";
+import { colorDemo } from "./demo/color";
+import { addText } from "./demo/text";
 
 @customElement("canvas-editor")
 export class CanvasEditor extends LitElement {
