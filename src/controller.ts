@@ -468,7 +468,7 @@ export class CanvasController<
   onClick(e: MouseEvent): void {
     super.onClick(e);
     if (this.canSelect && !this.isMoving) {
-      const point = new DOMPoint(e.clientX, e.clientY);
+      const point = new DOMPoint(e.offsetX, e.offsetY);
       this.selectIndex = 0;
       this.selectAt(point);
     }
@@ -477,7 +477,7 @@ export class CanvasController<
   onDoubleClick(e: MouseEvent): void {
     super.onDoubleClick(e);
     if (this.canSelect && !this.isMoving) {
-      const point = new DOMPoint(e.clientX, e.clientY);
+      const point = new DOMPoint(e.offsetX, e.offsetY);
       this.selectIndex += 1;
       this.selectAt(point);
     }
